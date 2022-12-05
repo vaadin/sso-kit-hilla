@@ -1,9 +1,8 @@
 logging:
     level:
+        root: info
         org:
             atmosphere: warn
-            springframework:
-                security: INFO
 server:
     port: 8080
     servlet:
