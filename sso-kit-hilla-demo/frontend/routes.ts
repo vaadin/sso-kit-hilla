@@ -75,7 +75,7 @@ export const routes: ViewRoute[] = [
     icon: '',
     title: 'Login',
     action: async (_context, _command) => {
-      await import('./views/login/login-view');
+      location.href = '/oauth2/authorization/keycloak';
       return;
     },
   },
