@@ -1,11 +1,14 @@
 package com.example.application.endpoints.helloworld;
 
+import javax.annotation.security.PermitAll;
+
 import com.example.application.data.endpoint.UserEndpoint;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
+
 import dev.hilla.Endpoint;
 import dev.hilla.Nonnull;
 
 @Endpoint
+@PermitAll
 public class HelloWorldEndpoint {
 
     @Nonnull
