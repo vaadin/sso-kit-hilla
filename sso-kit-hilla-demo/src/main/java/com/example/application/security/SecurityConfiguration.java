@@ -15,14 +15,19 @@ import com.vaadin.flow.spring.security.VaadinWebSecurity;
 @Configuration
 public class SecurityConfiguration extends VaadinWebSecurity {
 
-    public static final String LOGOUT_URL = "/";
+    public static final String LOGOUT_URL = "/logout";
+
+    private final KeycloakLogoutHandler keycloakLogoutHandler;
+
+    SecurityConfiguration(KeycloakLogoutHandler keycloakLogoutHandler) {
+        this.keycloakLogoutHandler = keycloakLogoutHandler;
+    }
 
     // The secret is stored in /config/secrets/application.properties by default.
     // Never commit the secret into version control; each environment should have
     // its own secret.
     // @Value("${com.example.application.auth.secret}")
     // private String authSecret;
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -38,13 +43,22 @@ public class SecurityConfiguration extends VaadinWebSecurity {
         // setLoginView(http, "/login", LOGOUT_URL);
         // setStatelessAuthentication(http, new SecretKeySpec(Base64.getDecoder().decode(authSecret), JwsAlgorithms.HS256),
         //         "com.example.application");
+        // http.oauth2Login(o -> {
+        //     o.loginPage("/oauth2/authorization/keycloak");
+        // }).logout(l -> {
+        //     l.logoutUrl("/logout");
+        // });
     }
 
     @Bean
     @Override
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.oauth2Login().loginPage("/oauth2/authorization/keycloak");
+        http.oauth2Login()
+                .loginPage("/oauth2/authorization/keycloak")
+                .and()
+                .logout()
+                .addLogoutHandler(keycloakLogoutHandler)
+                .logoutSuccessUrl("/");
         return http.build();
     }
-
 }
