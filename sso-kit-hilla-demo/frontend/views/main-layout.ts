@@ -1,6 +1,5 @@
 import { logout } from '@hilla/frontend';
 import '@vaadin-component-factory/vcf-nav';
-import '@vaadin/app-layout';
 import { AppLayout } from '@vaadin/app-layout';
 import '@vaadin/app-layout/vaadin-drawer-toggle';
 import '@vaadin/avatar';
@@ -12,10 +11,10 @@ import '@vaadin/tabs';
 import '@vaadin/tabs/vaadin-tab';
 import '@vaadin/vaadin-lumo-styles/vaadin-iconset';
 import User from 'Frontend/generated/dev/hilla/sso/endpoint/User';
+import { hasAccess, views } from 'Frontend/routes';
 import { html, render } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { router } from '../index';
-import { hasAccess, views } from '../routes';
 import { appStore } from '../stores/app-store';
 import { Layout } from './view';
 
@@ -28,6 +27,15 @@ interface RouteInfo {
 @customElement('main-layout')
 export class MainLayout extends Layout {
   render() {
+    const routes = this.getMenuRoutes().map(
+      (viewRoute) => html`
+        <vcf-nav-item path=${router.urlForPath(viewRoute.path)}>
+          <span class="${viewRoute.icon} nav-item-icon" slot="prefix" aria-hidden="true"></span>
+          ${viewRoute.title}
+        </vcf-nav-item>
+      `
+    );
+
     return html`
       <vaadin-app-layout primary-section="drawer">
         <header slot="drawer">
@@ -36,16 +44,7 @@ export class MainLayout extends Layout {
         <vaadin-scroller slot="drawer" scroll-direction="vertical">
           <!-- vcf-nav is not yet an official component -->
           <!-- For documentation, visit https://github.com/vaadin/vcf-nav#readme -->
-          <vcf-nav aria-label="${appStore.applicationName}">
-            ${this.getMenuRoutes().map(
-              (viewRoute) => html`
-                <vcf-nav-item path=${router.urlForPath(viewRoute.path)}>
-                  <span class="${viewRoute.icon} nav-item-icon" slot="prefix" aria-hidden="true"></span>
-                  ${viewRoute.title}
-                </vcf-nav-item>
-              `
-            )}
-          </vcf-nav>
+          <vcf-nav aria-label="${appStore.applicationName}">${routes}</vcf-nav>
         </vaadin-scroller>
 
         <footer slot="drawer">

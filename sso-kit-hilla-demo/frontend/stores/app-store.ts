@@ -18,7 +18,7 @@ export class AppStore {
   }
 
   setLocation(location: RouterLocation) {
-    const serverSideRoute = location.route?.path == '(.*)';
+    const serverSideRoute = location.route?.path === '(.*)';
     if (location.route && !serverSideRoute) {
       this.location = location.route.path;
     } else if (location.pathname.startsWith(location.baseUrl)) {

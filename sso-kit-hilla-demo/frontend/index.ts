@@ -21,7 +21,7 @@ window.addEventListener('vaadin-router-location-changed', (e) => {
   appStore.setLocation((e as CustomEvent).detail.location);
   const title = appStore.currentViewTitle;
   if (title) {
-    document.title = title + ' | ' + appStore.applicationName;
+    document.title = `${title} | ${appStore.applicationName}`;
   } else {
     document.title = appStore.applicationName;
   }
