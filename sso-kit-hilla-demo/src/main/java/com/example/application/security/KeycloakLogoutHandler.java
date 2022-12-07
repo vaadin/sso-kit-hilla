@@ -16,22 +16,24 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Component
 public class KeycloakLogoutHandler implements LogoutHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(KeycloakLogoutHandler.class);
+    private static final Logger logger = LoggerFactory
+            .getLogger(KeycloakLogoutHandler.class);
 
     @Override
-    public void logout(HttpServletRequest request, HttpServletResponse response, 
-      Authentication auth) {
+    public void logout(HttpServletRequest request, HttpServletResponse response,
+            Authentication auth) {
         logoutFromKeycloak((OidcUser) auth.getPrincipal());
     }
 
     private void logoutFromKeycloak(OidcUser user) {
-        String endSessionEndpoint = user.getIssuer() + "/protocol/openid-connect/logout";
+        String endSessionEndpoint = user.getIssuer()
+                + "/protocol/openid-connect/logout";
         UriComponentsBuilder builder = UriComponentsBuilder
-          .fromUriString(endSessionEndpoint)
-          .queryParam("id_token_hint", user.getIdToken().getTokenValue());
+                .fromUriString(endSessionEndpoint)
+                .queryParam("id_token_hint", user.getIdToken().getTokenValue());
 
-        ResponseEntity<String> logoutResponse = new RestTemplate().getForEntity(
-        builder.toUriString(), String.class);
+        ResponseEntity<String> logoutResponse = new RestTemplate()
+                .getForEntity(builder.toUriString(), String.class);
         if (logoutResponse.getStatusCode().is2xxSuccessful()) {
             logger.info("Successfulley logged out from Keycloak");
         } else {

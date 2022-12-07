@@ -23,8 +23,10 @@ public class SecurityConfiguration extends VaadinWebSecurity {
         this.keycloakLogoutHandler = keycloakLogoutHandler;
     }
 
-    // The secret is stored in /config/secrets/application.properties by default.
-    // Never commit the secret into version control; each environment should have
+    // The secret is stored in /config/secrets/application.properties by
+    // default.
+    // Never commit the secret into version control; each environment should
+    // have
     // its own secret.
     // @Value("${com.example.application.auth.secret}")
     // private String authSecret;
@@ -36,28 +38,29 @@ public class SecurityConfiguration extends VaadinWebSecurity {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-        http.authorizeRequests().requestMatchers(new AntPathRequestMatcher("/images/*.png")).permitAll();
+        http.authorizeRequests()
+                .requestMatchers(new AntPathRequestMatcher("/images/*.png"))
+                .permitAll();
         super.configure(http);
 
         // http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         // setLoginView(http, "/login", LOGOUT_URL);
-        // setStatelessAuthentication(http, new SecretKeySpec(Base64.getDecoder().decode(authSecret), JwsAlgorithms.HS256),
-        //         "com.example.application");
+        // setStatelessAuthentication(http, new
+        // SecretKeySpec(Base64.getDecoder().decode(authSecret),
+        // JwsAlgorithms.HS256),
+        // "com.example.application");
         // http.oauth2Login(o -> {
-        //     o.loginPage("/oauth2/authorization/keycloak");
+        // o.loginPage("/oauth2/authorization/keycloak");
         // }).logout(l -> {
-        //     l.logoutUrl("/logout");
+        // l.logoutUrl("/logout");
         // });
     }
 
     @Bean
     @Override
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.oauth2Login()
-                .loginPage("/oauth2/authorization/keycloak")
-                .and()
-                .logout()
-                .addLogoutHandler(keycloakLogoutHandler)
+        http.oauth2Login().loginPage("/oauth2/authorization/keycloak").and()
+                .logout().addLogoutHandler(keycloakLogoutHandler)
                 .logoutSuccessUrl("/");
         return http.build();
     }

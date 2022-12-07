@@ -25,18 +25,21 @@ public class AuthenticatedUser {
 
     private Optional<Authentication> getAuthentication() {
         SecurityContext context = SecurityContextHolder.getContext();
-        return Optional.ofNullable(context.getAuthentication())
-                .filter(authentication -> !(authentication instanceof AnonymousAuthenticationToken));
+        return Optional.ofNullable(context.getAuthentication()).filter(
+                authentication -> !(authentication instanceof AnonymousAuthenticationToken));
     }
 
     public Optional<User> get() {
-        return getAuthentication().map(authentication -> userRepository.findByUsername(authentication.getName()));
+        return getAuthentication().map(authentication -> userRepository
+                .findByUsername(authentication.getName()));
     }
 
     public void logout() {
         UI.getCurrent().getPage().setLocation(SecurityConfiguration.LOGOUT_URL);
         SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
-        logoutHandler.logout(VaadinServletRequest.getCurrent().getHttpServletRequest(), null, null);
+        logoutHandler.logout(
+                VaadinServletRequest.getCurrent().getHttpServletRequest(), null,
+                null);
     }
 
 }

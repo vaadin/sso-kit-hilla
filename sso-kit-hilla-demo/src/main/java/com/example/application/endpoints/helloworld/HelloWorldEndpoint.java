@@ -14,7 +14,8 @@ public class HelloWorldEndpoint {
     @Nonnull
     public String sayHello(@Nonnull String name) {
         if (name.isEmpty()) {
-            return "Hello " + new UserEndpoint().getAuthenticatedUser().get().getName();
+            return "Hello "
+                    + new UserEndpoint().getAuthenticatedUser().get().getName();
         } else {
             return "Hello " + name;
         }
