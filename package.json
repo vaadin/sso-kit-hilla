@@ -1,0 +1,17 @@
+{
+  "name": "root",
+  "private": true,
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.45.1",
+    "eslint": "^8.24.0",
+    "eslint-config-vaadin": "1.0.0-alpha.5",
+    "eslint-plugin-chai-friendly": "^0.7.2",
+    "lerna": "^6.1.0"
+  },
+  "workspaces": [
+    "*"
+  ],
+  "scripts": {
+    "check": "concurrently npm:lint npm:typecheck"
+  }
+}

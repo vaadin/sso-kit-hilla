@@ -1,6 +1,10 @@
 {
-  "name": "no-name",
+  "name": "sso-kit-hilla-demo",
   "license": "UNLICENSED",
+  "scripts": {
+    "lint": "eslint frontend/**/*.ts",
+    "typecheck": "tsc --noEmit --project test/tsconfig.json"
+  },
   "dependencies": {
     "@adobe/lit-mobx": "2.0.0",
     "@hilla/form": "2.0.0-alpha6",
