@@ -63,4 +63,22 @@ public class User extends AbstractEntity {
         this.profilePicture = profilePicture;
     }
 
+    private String ssoIssuer;
+    private String ssoTokenValue;
+
+    public String getSsoIssuer() {
+        return ssoIssuer;
+    }
+
+    public void setSsoIssuer(String ssoIssuer) {
+        this.ssoIssuer = ssoIssuer;
+    }
+
+    public String getSsoTokenValue() {
+        return ssoTokenValue;
+    }
+
+    public void setSsoTokenValue(String ssoTokenValue) {
+        this.ssoTokenValue = ssoTokenValue;
+    }
 }

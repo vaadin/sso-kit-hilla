@@ -1,5 +1,6 @@
 import { login as loginImpl, LoginResult, logout as logoutImpl } from '@hilla/frontend';
 import { appStore } from './stores/app-store';
+import {UserEndpoint} from "Frontend/generated/endpoints";
 
 interface Authentication {
   timestamp: number;
@@ -67,8 +68,10 @@ export async function login(username: string, password: string): Promise<LoginRe
  * Uses `localStorage` for offline support.
  */
 export async function logout() {
+  const user = await UserEndpoint.getAuthenticatedUser();
+  const logoutUrl = `${user?.ssoIssuer}/protocol/openid-connect/logout?post_logout_redirect_uri=http://localhost:8080/&id_token_hint=${user?.ssoTokenValue}`;
   setSessionExpired();
   await logoutImpl();
   appStore.clearUserInfo();
-  location.href = '';
+  location.href = logoutUrl;
 }

@@ -19,12 +19,16 @@ public class UserEndpoint {
     public Optional<User> getAuthenticatedUser() {
         return Optional.of(SecurityContextHolder.getContext())
                 .map(SecurityContext::getAuthentication)
-                .map(Authentication::getPrincipal).map(p -> (OidcUser) p)
+                .map(Authentication::getPrincipal)
+                .filter(p -> p instanceof OidcUser)
+                .map(p -> (OidcUser) p)
                 .map(ou -> {
                     User user = new User();
                     user.setName(ou.getUserInfo().getClaimAsString("name"));
                     user.setUsername(ou.getUserInfo()
                             .getClaimAsString("preferred_username"));
+                    user.setSsoIssuer(ou.getIssuer().toString());
+                    user.setSsoTokenValue(ou.getIdToken().getTokenValue());
                     return user;
                 });
     }
