@@ -1,5 +1,6 @@
 import { login as loginImpl, LoginResult, logout as logoutImpl } from '@hilla/frontend';
 import { appStore } from './stores/app-store';
+import * as LogoutEndpoint from 'Frontend/generated/LogoutEndpoint';
 
 interface Authentication {
   timestamp: number;
@@ -68,7 +69,8 @@ export async function login(username: string, password: string): Promise<LoginRe
  */
 export async function logout() {
   setSessionExpired();
-  await logoutImpl();
+  await LogoutEndpoint.logout();
+  // await logoutImpl();
   appStore.clearUserInfo();
   location.href = '';
 }

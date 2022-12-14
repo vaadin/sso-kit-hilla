@@ -1,19 +1,29 @@
 package com.example.application.endpoints.helloworld;
 
-import com.example.application.data.endpoint.UserEndpoint;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
+import javax.annotation.security.PermitAll;
+
+import com.vaadin.flow.spring.security.AuthenticationContext;
 
 import dev.hilla.Endpoint;
 import dev.hilla.Nonnull;
+import org.springframework.security.core.AuthenticatedPrincipal;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
 @Endpoint
-@AnonymousAllowed
+@PermitAll
 public class HelloWorldEndpoint {
+
+    private final AuthenticationContext authenticationContext;
+
+    public HelloWorldEndpoint(AuthenticationContext authenticationContext) {
+        this.authenticationContext = authenticationContext;
+    }
 
     @Nonnull
     public String sayHello(@Nonnull String name) {
         if (name.isEmpty()) {
-            return "Hello " + new UserEndpoint().getAuthenticatedUser().get().getName();
+            return "Hello " + authenticationContext.getAuthenticatedUser(OidcUser.class)
+                    .map(AuthenticatedPrincipal::getName);
         } else {
             return "Hello " + name;
         }

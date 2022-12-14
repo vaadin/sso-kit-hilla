@@ -132,6 +132,7 @@
             </activation>
             <modules>
                 <module>sso-kit-hilla-demo</module>
+                <module>hilla-sso-kit-flow-example</module>
             </modules>
         </profile>
     </profiles>
