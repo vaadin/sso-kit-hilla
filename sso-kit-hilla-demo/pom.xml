@@ -13,6 +13,11 @@
 
     <artifactId>sso-kit-hilla-demo</artifactId>
 
+    <properties>
+        <!-- This parameter is needed as spring-boot bom overwrites it -->
+        <selenium.version>4.5.3</selenium.version>
+    </properties>
+
     <repositories>
         <!-- The order of definitions matters. Explicitly defining central here to make sure it has the highest priority. -->
         <!-- Main Maven repository -->
