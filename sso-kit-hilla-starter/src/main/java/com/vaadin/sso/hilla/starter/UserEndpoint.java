@@ -1,4 +1,4 @@
-package com.example.application.data.endpoint;
+package com.vaadin.sso.hilla.starter;
 
 import java.util.Optional;
 
@@ -7,7 +7,6 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
-import com.example.application.data.entity.User;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 
 import dev.hilla.Endpoint;
