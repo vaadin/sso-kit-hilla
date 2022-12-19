@@ -1,5 +1,4 @@
 import { Route } from '@vaadin/router';
-import Role from './generated/com/example/application/data/Role';
 import { appStore } from './stores/app-store';
 import './views/about/about-view';
 import './views/main-layout';
@@ -8,7 +7,7 @@ export type ViewRoute = Route & {
   title?: string;
   icon?: string;
   requiresLogin?: boolean;
-  rolesAllowed?: Role[];
+  rolesAllowed?: string[];
   children?: ViewRoute[];
 };
 

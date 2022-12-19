@@ -10,11 +10,9 @@ import '@vaadin/scroller';
 import '@vaadin/tabs';
 import '@vaadin/tabs/vaadin-tab';
 import '@vaadin/vaadin-lumo-styles/vaadin-iconset';
-import type User from 'Frontend/generated/com/example/application/data/entity/User';
-import { imageDataUrl } from 'Frontend/util';
+import User from 'Frontend/generated/com/vaadin/sso/hilla/starter/User';
 import { html, render } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { until } from 'lit/directives/until.js';
 import { logout } from '../auth';
 import { router } from '../index';
 import { hasAccess, views } from '../routes';
@@ -97,12 +95,6 @@ export class MainLayout extends Layout {
     item.style.gap = 'var(--lumo-space-s)';
     render(
       html`
-        <vaadin-avatar
-          theme="xsmall"
-          img="${until(imageDataUrl(user.profilePicture))}"
-          name="${user.name}"
-          tabindex="-1"
-        ></vaadin-avatar>
         <span>${user.name}</span>
         <vaadin-icon icon="lumo:dropdown"></vaadin-icon>
       `,

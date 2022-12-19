@@ -1,6 +1,5 @@
 import { RouterLocation } from '@vaadin/router';
-import User from 'Frontend/generated/com/example/application/data/entity/User';
-import Role from 'Frontend/generated/com/example/application/data/Role';
+import User from 'Frontend/generated/com/vaadin/sso/hilla/starter/User';
 import { UserEndpoint } from 'Frontend/generated/endpoints';
 import { makeAutoObservable } from 'mobx';
 
@@ -46,7 +45,7 @@ export class AppStore {
     return !!this.user;
   }
 
-  isUserInRole(role: Role) {
+  isUserInRole(role: string) {
     return this.user?.roles?.includes(role);
   }
 }
