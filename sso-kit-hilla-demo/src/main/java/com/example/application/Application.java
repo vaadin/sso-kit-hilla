@@ -19,7 +19,8 @@ import com.vaadin.flow.theme.Theme;
 @PWA(name = "sso-kit-hilla-demo", shortName = "sso-kit-hilla-demo", offlineResources = {})
 public class Application implements AppShellConfigurator {
 
-    public static void main(String[] args) {        SpringApplication.run(Application.class, args);
+    public static void main(String[] args) {
+        SpringApplication.runz(Application.class, args);
     }
 
 }
