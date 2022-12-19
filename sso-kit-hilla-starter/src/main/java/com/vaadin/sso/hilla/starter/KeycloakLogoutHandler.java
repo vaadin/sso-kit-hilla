@@ -1,4 +1,4 @@
-package com.example.application.security;
+package com.vaadin.sso.hilla.starter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

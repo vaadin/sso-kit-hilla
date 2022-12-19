@@ -1,4 +1,4 @@
-package com.example.application.security;
+package com.vaadin.sso.hilla.starter;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,7 +19,7 @@ public class SecurityConfiguration extends VaadinWebSecurity {
 
     private final KeycloakLogoutHandler keycloakLogoutHandler;
 
-    SecurityConfiguration(KeycloakLogoutHandler keycloakLogoutHandler) {
+    public SecurityConfiguration(KeycloakLogoutHandler keycloakLogoutHandler) {
         this.keycloakLogoutHandler = keycloakLogoutHandler;
     }
 

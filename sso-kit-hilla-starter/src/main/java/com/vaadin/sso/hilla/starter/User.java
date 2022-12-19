@@ -1,21 +1,12 @@
-package com.example.application.data.entity;
+package com.vaadin.sso.hilla.starter;
 
-import com.example.application.data.Role;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import dev.hilla.Nonnull;
 import java.util.Set;
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.Lob;
-import javax.persistence.Table;
 
-@Entity
-@Table(name = "application_user")
-public class User extends AbstractEntity {
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import dev.hilla.Nonnull;
+
+public class User {
 
     @Nonnull
     private String username;
@@ -23,13 +14,9 @@ public class User extends AbstractEntity {
     private String name;
     @JsonIgnore
     private String hashedPassword;
-    @Enumerated(EnumType.STRING)
-    @ElementCollection(fetch = FetchType.EAGER)
     @Nonnull
-    private Set<Role> roles;
+    private Set<String> roles;
     @Nonnull
-    @Lob
-    @Column(length = 1000000)
     private byte[] profilePicture;
 
     public String getUsername() {
@@ -56,11 +43,11 @@ public class User extends AbstractEntity {
         this.hashedPassword = hashedPassword;
     }
 
-    public Set<Role> getRoles() {
+    public Set<String> getRoles() {
         return roles;
     }
 
-    public void setRoles(Set<Role> roles) {
+    public void setRoles(Set<String> roles) {
         this.roles = roles;
     }
 

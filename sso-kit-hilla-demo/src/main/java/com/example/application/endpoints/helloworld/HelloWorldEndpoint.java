@@ -2,7 +2,7 @@ package com.example.application.endpoints.helloworld;
 
 import javax.annotation.security.PermitAll;
 
-import com.example.application.data.endpoint.UserEndpoint;
+import com.vaadin.sso.hilla.starter.UserEndpoint;
 
 import dev.hilla.Endpoint;
 import dev.hilla.Nonnull;
