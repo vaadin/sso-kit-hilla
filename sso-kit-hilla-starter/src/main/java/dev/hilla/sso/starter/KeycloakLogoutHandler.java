@@ -1,4 +1,4 @@
-package com.vaadin.sso.hilla.starter;
+package dev.hilla.sso.starter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

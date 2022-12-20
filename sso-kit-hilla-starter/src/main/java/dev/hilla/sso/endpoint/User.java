@@ -1,4 +1,4 @@
-package com.vaadin.sso.hilla.starter;
+package dev.hilla.sso.endpoint;
 
 import java.util.Set;
 
@@ -16,8 +16,6 @@ public class User {
     private String hashedPassword;
     @Nonnull
     private Set<String> roles;
-    @Nonnull
-    private byte[] profilePicture;
 
     public String getUsername() {
         return username;
@@ -49,14 +47,6 @@ public class User {
 
     public void setRoles(Set<String> roles) {
         this.roles = roles;
-    }
-
-    public byte[] getProfilePicture() {
-        return profilePicture;
-    }
-
-    public void setProfilePicture(byte[] profilePicture) {
-        this.profilePicture = profilePicture;
     }
 
 }

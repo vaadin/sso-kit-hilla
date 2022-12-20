@@ -1,6 +1,6 @@
 import { RouterLocation } from '@vaadin/router';
-import User from 'Frontend/generated/com/vaadin/sso/hilla/starter/User';
-import { UserEndpoint } from 'Frontend/generated/endpoints';
+import User from 'Frontend/generated/dev/hilla/sso/endpoint/User';
+import { AuthEndpoint } from 'Frontend/generated/endpoints';
 import { makeAutoObservable } from 'mobx';
 
 export class AppStore {
@@ -34,7 +34,7 @@ export class AppStore {
   }
 
   async fetchUserInfo() {
-    this.user = await UserEndpoint.getAuthenticatedUser();
+    this.user = await AuthEndpoint.getAuthenticatedUser();
   }
 
   clearUserInfo() {

@@ -10,7 +10,7 @@ import '@vaadin/scroller';
 import '@vaadin/tabs';
 import '@vaadin/tabs/vaadin-tab';
 import '@vaadin/vaadin-lumo-styles/vaadin-iconset';
-import User from 'Frontend/generated/com/vaadin/sso/hilla/starter/User';
+import User from 'Frontend/generated/dev/hilla/sso/endpoint/User';
 import { html, render } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { logout } from '../auth';

@@ -1,4 +1,5 @@
 import { Route } from '@vaadin/router';
+import { AuthEndpoint } from './generated/endpoints';
 import { appStore } from './stores/app-store';
 import './views/about/about-view';
 import './views/main-layout';
@@ -55,12 +56,11 @@ export const views: ViewRoute[] = [
 export const routes: ViewRoute[] = [
   {
     path: 'login',
-    component: 'login-view',
-    requiresLogin: true,
     icon: '',
     title: 'Login',
     action: async (_context, _command) => {
-      location.href = '/oauth2/authorization/keycloak';
+      const url = await AuthEndpoint.getLoginURL();
+      location.href = url;
       return;
     },
   },

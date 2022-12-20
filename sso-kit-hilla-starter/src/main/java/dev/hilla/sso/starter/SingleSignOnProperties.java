@@ -1,4 +1,4 @@
-package com.vaadin.sso.hilla.starter;
+package dev.hilla.sso.starter;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
