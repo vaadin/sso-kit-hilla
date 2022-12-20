@@ -1,4 +1,4 @@
-package com.vaadin.sso.hilla.starter;
+package dev.hilla.sso.starter;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

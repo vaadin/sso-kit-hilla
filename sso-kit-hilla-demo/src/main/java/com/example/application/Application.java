@@ -14,7 +14,8 @@ import com.vaadin.flow.theme.Theme;
  * and some desktop browsers.
  *
  */
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = { "com.example.application",
+        "dev.hilla.sso.endpoint" })
 @Theme(value = "sso-kit-hilla-demo")
 @PWA(name = "sso-kit-hilla-demo", shortName = "sso-kit-hilla-demo", offlineResources = {})
 public class Application implements AppShellConfigurator {

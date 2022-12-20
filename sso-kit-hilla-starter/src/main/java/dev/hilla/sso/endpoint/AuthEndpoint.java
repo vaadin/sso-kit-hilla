@@ -1,4 +1,4 @@
-package com.vaadin.sso.hilla.starter;
+package dev.hilla.sso.endpoint;
 
 import java.util.Optional;
 
@@ -10,15 +10,22 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 
 import dev.hilla.Endpoint;
+import dev.hilla.Nonnull;
 
 @Endpoint
 @AnonymousAllowed
-public class UserEndpoint {
+public class AuthEndpoint {
+
+    @Nonnull
+    public String getLoginURL() {
+        return "/oauth2/authorization/keycloak";
+    }
 
     public Optional<User> getAuthenticatedUser() {
         return Optional.of(SecurityContextHolder.getContext())
                 .map(SecurityContext::getAuthentication)
-                .map(Authentication::getPrincipal).map(p -> (OidcUser) p)
+                .map(Authentication::getPrincipal)
+                .filter(OidcUser.class::isInstance).map(p -> (OidcUser) p)
                 .map(ou -> {
                     User user = new User();
                     user.setName(ou.getUserInfo().getClaimAsString("name"));
