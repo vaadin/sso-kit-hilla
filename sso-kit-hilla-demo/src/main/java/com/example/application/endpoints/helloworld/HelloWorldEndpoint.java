@@ -3,10 +3,10 @@ package com.example.application.endpoints.helloworld;
 import dev.hilla.Endpoint;
 import dev.hilla.Nonnull;
 import dev.hilla.sso.endpoint.AuthEndpoint;
-import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 
 @Endpoint
-@PermitAll
+@RolesAllowed("ROLE_USER")
 public class HelloWorldEndpoint {
 
     @Nonnull

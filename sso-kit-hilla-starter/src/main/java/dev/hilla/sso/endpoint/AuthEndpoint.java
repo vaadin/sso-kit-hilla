@@ -1,6 +1,7 @@
 package dev.hilla.sso.endpoint;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -31,6 +32,9 @@ public class AuthEndpoint {
                     user.setName(ou.getUserInfo().getClaimAsString("name"));
                     user.setUsername(ou.getUserInfo()
                             .getClaimAsString("preferred_username"));
+                    user.setRoles(ou.getAuthorities().stream()
+                            .map(a -> a.getAuthority())
+                            .collect(Collectors.toSet()));
                     return user;
                 });
     }
