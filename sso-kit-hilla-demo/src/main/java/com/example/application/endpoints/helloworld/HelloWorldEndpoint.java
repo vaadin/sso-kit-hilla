@@ -1,10 +1,9 @@
 package com.example.application.endpoints.helloworld;
 
-import javax.annotation.security.PermitAll;
-
 import dev.hilla.Endpoint;
 import dev.hilla.Nonnull;
 import dev.hilla.sso.endpoint.AuthEndpoint;
+import jakarta.annotation.security.PermitAll;
 
 @Endpoint
 @PermitAll
