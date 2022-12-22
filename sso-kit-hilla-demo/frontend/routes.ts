@@ -1,4 +1,5 @@
 import { Route } from '@vaadin/router';
+import ClientParameters from './generated/dev/hilla/sso/endpoint/ClientParameters';
 import { AuthEndpoint } from './generated/endpoints';
 import { appStore } from './stores/app-store';
 import './views/about/about-view';
@@ -59,9 +60,8 @@ export const routes: ViewRoute[] = [
     icon: '',
     title: 'Login',
     action: async (_context, _command) => {
-      const url = await AuthEndpoint.getLoginURL();
-      location.href = url;
-      return;
+      const params = (globalThis as any).Hilla.SSO as ClientParameters;
+      location.href = params.loginURL;
     },
   },
 

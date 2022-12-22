@@ -11,15 +11,15 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 
 import dev.hilla.Endpoint;
-import dev.hilla.Nonnull;
 
 @Endpoint
 @AnonymousAllowed
 public class AuthEndpoint {
 
-    @Nonnull
-    public String getLoginURL() {
-        return "/oauth2/authorization/keycloak";
+    public ClientParameters getClientParameters() {
+        ClientParameters clientParameters = new ClientParameters();
+        clientParameters.setLoginURL("/oauth2/authorization/keycloak");
+        return clientParameters;
     }
 
     public Optional<User> getAuthenticatedUser() {
