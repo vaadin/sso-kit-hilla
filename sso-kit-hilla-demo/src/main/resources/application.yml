@@ -1,33 +1,37 @@
 logging:
-    level:
-        root: info
-        org:
-            atmosphere: warn
+  level:
+    root: info
+    org:
+      atmosphere: warn
 server:
-    port: 8080
-    servlet:
-        session:
-            tracking-modes: cookie
+  port: 8080
+  servlet:
+    session:
+      tracking-modes: cookie
 spring:
-    jpa:
-        defer-datasource-initialization: true
-    mustache:
-        check-template-location: false
-    security:
-        oauth2:
-            client:
-                provider:
-                    keycloak: # This is the registration-id, can be any value
-                        issuer-uri: http://localhost:8081/realms/demo
-                registration:
-                    keycloak: # This should be the same as the registration-id
-                        client-id: hilla
-                        client-secret: fG1bFYMQmx0NnLojfejCyEbJQDQovere
-                        scope:
-                        - profile
-                        - openid
-                        - email
-                        - roles
+  jpa:
+    defer-datasource-initialization: true
+  mustache:
+    check-template-location: false
+  security:
+    oauth2:
+      client:
+        provider:
+          keycloak: # This is the registration-id, can be any value
+            issuer-uri: http://localhost:8081/realms/demo
+        registration:
+          keycloak: # This should be the same as the registration-id
+            client-id: hilla
+            client-secret: fG1bFYMQmx0NnLojfejCyEbJQDQovere
+            scope:
+              - profile
+              - openid
+              - email
+              - roles
+
 vaadin:
-    launch-browser: true
-    whitelisted-packages: com.vaadin,org.vaadin,dev.hilla,com.example.application
+  launch-browser: true
+  whitelisted-packages: com.vaadin,org.vaadin,dev.hilla,com.example.application
+hilla:
+  sso:
+    login-route: /oauth2/authorization/keycloak

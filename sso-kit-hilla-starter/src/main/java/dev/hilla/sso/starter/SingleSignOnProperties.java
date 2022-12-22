@@ -3,7 +3,7 @@ package dev.hilla.sso.starter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * Definition of configuration properties for the SSO Kit starter.
+ * Definition of configuration properties for the SSO Kit Hilla starter.
  *
  * @author Vaadin Ltd
  * @since 1.0
@@ -12,9 +12,16 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class SingleSignOnProperties {
 
     /**
-     * The prefix for SSO Kit starter properties.
+     * The prefix for SSO Kit Hilla starter properties.
      */
-    public static final String PREFIX = "vaadin.sso";
+    public static final String PREFIX = "hilla.sso";
+
+    /**
+     * The default login route. Unauthorized requests will be redirected to this
+     * route. If there are no views mapped to this route, Spring's default login
+     * page will be generated.
+     */
+    static final String DEFAULT_LOGIN_ROUTE = "/login";
 
     /**
      * The default logout-redirect route. Web browsers will be redirected to
@@ -30,7 +37,7 @@ public class SingleSignOnProperties {
     /**
      * The route to redirect unauthorized requests to.
      */
-    private String loginRoute;
+    private String loginRoute = DEFAULT_LOGIN_ROUTE;
 
     /**
      * The route to redirect to after successful logout.
