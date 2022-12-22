@@ -38,7 +38,7 @@ public class SecurityConfiguration extends VaadinWebSecurity {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-        http.authorizeRequests()
+        http.authorizeHttpRequests()
                 .requestMatchers(new AntPathRequestMatcher("/images/*.png"))
                 .permitAll();
         super.configure(http);
@@ -56,7 +56,7 @@ public class SecurityConfiguration extends VaadinWebSecurity {
         // });
     }
 
-    @Bean
+    @Bean(name = "VaadinSecurityFilterChainBean")
     @Override
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.oauth2Login().loginPage("/oauth2/authorization/keycloak").and()
