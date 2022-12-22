@@ -60,8 +60,7 @@ export const routes: ViewRoute[] = [
     icon: '',
     title: 'Login',
     action: async (_context, _command) => {
-      const params = (globalThis as any).Hilla.SSO as ClientParameters;
-      location.href = params.loginURL;
+      location.href = Hilla.SSO.loginURL;
     },
   },
 
