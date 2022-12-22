@@ -3,6 +3,8 @@ package dev.hilla.sso.endpoint;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import dev.hilla.Nonnull;
+import dev.hilla.sso.starter.SingleSignOnProperties;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,10 +18,15 @@ import dev.hilla.Endpoint;
 @AnonymousAllowed
 public class AuthEndpoint {
 
-    public ClientParameters getClientParameters() {
-        ClientParameters clientParameters = new ClientParameters();
-        clientParameters.setLoginURL("/oauth2/authorization/keycloak");
-        return clientParameters;
+    private final SingleSignOnProperties properties;
+
+    public AuthEndpoint(SingleSignOnProperties properties) {
+        this.properties = properties;
+    }
+
+    @Nonnull
+    public String getLoginRoute() {
+        return properties.getLoginRoute();
     }
 
     public Optional<User> getAuthenticatedUser() {

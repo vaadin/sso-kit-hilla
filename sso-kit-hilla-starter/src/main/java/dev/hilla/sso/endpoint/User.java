@@ -2,8 +2,6 @@ package dev.hilla.sso.endpoint;
 
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import dev.hilla.Nonnull;
 
 public class User {
@@ -12,8 +10,6 @@ public class User {
     private String username;
     @Nonnull
     private String name;
-    @JsonIgnore
-    private String hashedPassword;
     @Nonnull
     private Set<String> roles;
 
@@ -33,14 +29,6 @@ public class User {
         this.name = name;
     }
 
-    public String getHashedPassword() {
-        return hashedPassword;
-    }
-
-    public void setHashedPassword(String hashedPassword) {
-        this.hashedPassword = hashedPassword;
-    }
-
     public Set<String> getRoles() {
         return roles;
     }
@@ -48,5 +36,4 @@ public class User {
     public void setRoles(Set<String> roles) {
         this.roles = roles;
     }
-
 }
