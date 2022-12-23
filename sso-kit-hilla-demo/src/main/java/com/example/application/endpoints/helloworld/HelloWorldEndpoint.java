@@ -1,26 +1,23 @@
 package com.example.application.endpoints.helloworld;
 
 import dev.hilla.Endpoint;
-import dev.hilla.Nonnull;
 import dev.hilla.sso.endpoint.AuthEndpoint;
-import dev.hilla.sso.starter.SingleSignOnProperties;
-import jakarta.annotation.security.RolesAllowed;
+import jakarta.annotation.security.PermitAll;
 
 @Endpoint
-@RolesAllowed("ROLE_USER")
+@PermitAll
 public class HelloWorldEndpoint {
 
-    private final SingleSignOnProperties properties;
+    private final AuthEndpoint authEndpoint;
 
-    public HelloWorldEndpoint(SingleSignOnProperties properties) {
-        this.properties = properties;
+    public HelloWorldEndpoint(AuthEndpoint authEndpoint) {
+        this.authEndpoint = authEndpoint;
     }
 
-    @Nonnull
-    public String sayHello(@Nonnull String name) {
+    public String sayHello(String name) {
         if (name.isEmpty()) {
-            return "Hello " + new AuthEndpoint(properties)
-                    .getAuthenticatedUser().get().getName();
+            return "Hello "
+                    + authEndpoint.getAuthenticatedUser().get().getName();
         } else {
             return "Hello " + name;
         }
