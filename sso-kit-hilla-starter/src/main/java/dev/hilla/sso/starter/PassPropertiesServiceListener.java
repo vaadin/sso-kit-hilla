@@ -12,13 +12,14 @@ import elemental.json.JsonObject;
 public class PassPropertiesServiceListener
         implements VaadinServiceInitListener {
 
+    private final ClientParameters clientParameters;
+
+    public PassPropertiesServiceListener(ClientParameters clientParameters) {
+        this.clientParameters = clientParameters;
+    }
+
     @Override
     public void serviceInit(com.vaadin.flow.server.ServiceInitEvent event) {
-        ClientParameters clientParameters = new ClientParameters();
-        clientParameters.setLoginURL("/oauth2/authorization/keycloak");
-
-        // convert clientParameters to jsonobject
-        // add it to the index.html
         JsonObject jsonObject = JsonUtils.beanToJson(clientParameters);
 
         event.addIndexHtmlRequestListener(indexHtmlResponse -> {

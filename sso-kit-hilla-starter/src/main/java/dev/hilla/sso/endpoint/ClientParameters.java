@@ -1,13 +1,18 @@
 package dev.hilla.sso.endpoint;
 
+import org.springframework.stereotype.Component;
+
+import dev.hilla.sso.starter.SingleSignOnProperties;
+
+@Component
 public class ClientParameters {
-    private String loginURL;
+    private final String loginURL;
+
+    public ClientParameters(SingleSignOnProperties properties) {
+        loginURL = properties.getLoginRoute();
+    }
 
     public String getLoginURL() {
         return loginURL;
-    }
-
-    public void setLoginURL(String loginURL) {
-        this.loginURL = loginURL;
     }
 }

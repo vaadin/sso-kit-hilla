@@ -3,8 +3,6 @@ package dev.hilla.sso.endpoint;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import dev.hilla.Nonnull;
-import dev.hilla.sso.starter.SingleSignOnProperties;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,15 +16,17 @@ import dev.hilla.Endpoint;
 @AnonymousAllowed
 public class AuthEndpoint {
 
-    private final SingleSignOnProperties properties;
+    private final ClientParameters clientParameters;
 
-    public AuthEndpoint(SingleSignOnProperties properties) {
-        this.properties = properties;
+    public AuthEndpoint(ClientParameters clientParameters) {
+        this.clientParameters = clientParameters;
     }
 
-    @Nonnull
-    public String getLoginRoute() {
-        return properties.getLoginRoute();
+    // This method is not really useful since the configuration is already
+    // available on the client. It exists to let Hilla translate
+    // ClientParameters to TypeScript and get code completion and type safety.
+    public ClientParameters getClientParameters() {
+        return clientParameters;
     }
 
     public Optional<User> getAuthenticatedUser() {
