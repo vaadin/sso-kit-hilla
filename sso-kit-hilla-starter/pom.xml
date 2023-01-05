@@ -84,6 +84,10 @@
             <artifactId>jakarta.websocket-api</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>license-checker</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

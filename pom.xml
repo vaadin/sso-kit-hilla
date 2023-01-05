@@ -79,6 +79,11 @@
                 <artifactId>vaadin-spring</artifactId>
                 <version>${flow.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.vaadin</groupId>
+                <artifactId>license-checker</artifactId>
+                <version>1.10.0</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
