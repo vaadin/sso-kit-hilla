@@ -24,6 +24,8 @@ import dev.hilla.Endpoint;
 @Endpoint
 @AnonymousAllowed
 public class AuthEndpoint {
+    private static final String ROLE_PREFIX = "ROLE_";
+    private static final int ROLE_PREFIX_LENGTH = ROLE_PREFIX.length();
 
     private final ClientParameters clientParameters;
 
@@ -50,6 +52,8 @@ public class AuthEndpoint {
                             .getClaimAsString("preferred_username"));
                     user.setRoles(ou.getAuthorities().stream()
                             .map(a -> a.getAuthority())
+                            .filter(a -> a.startsWith(ROLE_PREFIX))
+                            .map(a -> a.substring(ROLE_PREFIX_LENGTH))
                             .collect(Collectors.toSet()));
                     return user;
                 });
