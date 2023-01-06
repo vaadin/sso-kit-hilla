@@ -28,7 +28,7 @@ Add the `sso-kit-starter` module and the other required dependencies to the `pom
 <dependency>
     <groupId>dev.hilla</groupId>
     <artifactId>sso-kit-hilla-starter</artifactId>
-    <version>2.0-SNAPSHOT</version>
+    <version>1.3-SNAPSHOT</version>
 </dependency>
 
 <dependency>
