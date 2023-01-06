@@ -187,6 +187,8 @@ Add a `login` route to the exported routes:
 },
 ```
 
+### Add login and logout to the interface
+
 Open `frontend/views/main-layout.ts` and add a login/logout button in the `footer`:
 
 ```html
