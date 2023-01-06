@@ -26,10 +26,13 @@ public class SingleSignOnConfiguration extends VaadinWebSecurity {
 
     private final KeycloakLogoutHandler keycloakLogoutHandler;
 
+    private final SingleSignOnUserService userService;
+
     public SingleSignOnConfiguration(SingleSignOnProperties properties,
             KeycloakLogoutHandler keycloakLogoutHandler) {
         this.properties = properties;
         this.keycloakLogoutHandler = keycloakLogoutHandler;
+        userService = new SingleSignOnUserService();
     }
 
     @Override
@@ -43,7 +46,8 @@ public class SingleSignOnConfiguration extends VaadinWebSecurity {
     @Bean(name = "VaadinSecurityFilterChainBean")
     @Override
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.oauth2Login().loginPage(properties.getLoginRoute()).and().logout()
+        http.oauth2Login().userInfoEndpoint().oidcUserService(userService).and()
+                .loginPage(properties.getLoginRoute()).and().logout()
                 .addLogoutHandler(keycloakLogoutHandler)
                 .logoutSuccessUrl(properties.getLogoutRedirectRoute());
         return http.build();
