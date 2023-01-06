@@ -4,7 +4,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import com.vaadin.flow.component.page.AppShellConfigurator;
-import com.vaadin.flow.server.PWA;
 import com.vaadin.flow.theme.Theme;
 
 /**
@@ -15,9 +14,8 @@ import com.vaadin.flow.theme.Theme;
  *
  */
 @SpringBootApplication(scanBasePackages = { "com.example.application",
-        "dev.hilla.sso" })
+        "dev.hilla.sso.starter", "dev.hilla.sso.endpoint" })
 @Theme(value = "sso-kit-hilla-demo")
-@PWA(name = "sso-kit-hilla-demo", shortName = "sso-kit-hilla-demo", offlineResources = {})
 public class Application implements AppShellConfigurator {
 
     public static void main(String[] args) {

@@ -1,3 +1,4 @@
+import { logout } from '@hilla/frontend';
 import '@vaadin-component-factory/vcf-nav';
 import '@vaadin/app-layout';
 import { AppLayout } from '@vaadin/app-layout';
@@ -13,7 +14,6 @@ import '@vaadin/vaadin-lumo-styles/vaadin-iconset';
 import User from 'Frontend/generated/dev/hilla/sso/endpoint/User';
 import { html, render } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { logout } from '../auth';
 import { router } from '../index';
 import { hasAccess, views } from '../routes';
 import { appStore } from '../stores/app-store';
@@ -103,9 +103,11 @@ export class MainLayout extends Layout {
     return item;
   }
 
-  private userMenuItemSelected(e: MenuBarItemSelectedEvent) {
+  private async userMenuItemSelected(e: MenuBarItemSelectedEvent) {
     if (e.detail.value.text === 'Sign out') {
-      logout();
+      appStore.clearUserInfo();
+      await logout();
+      location.href = '';
     }
   }
 

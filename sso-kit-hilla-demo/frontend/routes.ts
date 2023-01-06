@@ -1,8 +1,7 @@
 import { Route } from '@vaadin/router';
-import ClientParameters from './generated/dev/hilla/sso/endpoint/ClientParameters';
-import { AuthEndpoint } from './generated/endpoints';
 import { appStore } from './stores/app-store';
 import './views/about/about-view';
+import './views/helloworld/hello-world-view';
 import './views/main-layout';
 
 export type ViewRoute = Route & {
@@ -35,16 +34,11 @@ export const views: ViewRoute[] = [
   },
   {
     path: 'hello',
-    component: 'hello-world-view',
     requiresLogin: true,
     icon: 'la la-globe',
     title: 'Hello World',
     action: async (_context, _command) => {
-      if (!hasAccess(_context.route)) {
-        return _command.redirect('login');
-      }
-      await import('./views/helloworld/hello-world-view');
-      return;
+      return hasAccess(_context.route) ? _command.component('hello-world-view') : _command.redirect('login');
     },
   },
   {
@@ -63,7 +57,6 @@ export const routes: ViewRoute[] = [
       location.href = Hilla.SSO.loginURL;
     },
   },
-
   {
     path: '',
     component: 'main-layout',
