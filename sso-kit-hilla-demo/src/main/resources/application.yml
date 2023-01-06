@@ -35,3 +35,4 @@ vaadin:
 hilla:
   sso:
     login-route: /oauth2/authorization/keycloak
+    back-channel-logout: true

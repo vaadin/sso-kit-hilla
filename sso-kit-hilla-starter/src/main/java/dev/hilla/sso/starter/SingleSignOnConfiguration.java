@@ -9,14 +9,23 @@
  */
 package dev.hilla.sso.starter;
 
+import java.util.Objects;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.vaadin.flow.spring.security.VaadinWebSecurity;
+
+import dev.hilla.sso.starter.bclogout.BackChannelLogoutFilter;
+import dev.hilla.sso.starter.bclogout.FluxHolder;
+import dev.hilla.sso.starter.bclogout.UidlExpiredSessionStrategy;
 
 @Configuration
 @EnableWebSecurity
@@ -28,11 +37,21 @@ public class SingleSignOnConfiguration extends VaadinWebSecurity {
 
     private final SingleSignOnUserService userService;
 
+    private final BackChannelLogoutFilter backChannelLogoutFilter;
+
+    private final SessionRegistry sessionRegistry;
+
     public SingleSignOnConfiguration(SingleSignOnProperties properties,
-            KeycloakLogoutHandler keycloakLogoutHandler) {
+            SessionRegistry sessionRegistry,
+            ClientRegistrationRepository clientRegistrationRepository,
+            KeycloakLogoutHandler keycloakLogoutHandler,
+            FluxHolder fluxHolder) {
         this.properties = properties;
+        this.sessionRegistry = sessionRegistry;
         this.keycloakLogoutHandler = keycloakLogoutHandler;
         userService = new SingleSignOnUserService();
+        backChannelLogoutFilter = new BackChannelLogoutFilter(sessionRegistry,
+                clientRegistrationRepository, fluxHolder);
     }
 
     @Override
@@ -50,6 +69,34 @@ public class SingleSignOnConfiguration extends VaadinWebSecurity {
                 .loginPage(properties.getLoginRoute()).and().logout()
                 .addLogoutHandler(keycloakLogoutHandler)
                 .logoutSuccessUrl(properties.getLogoutRedirectRoute());
+
+        if (properties.isBackChannelLogout()) {
+            var backChannelLogoutRoute = Objects.requireNonNullElse(
+                    properties.getBackChannelLogoutRoute(),
+                    SingleSignOnProperties.DEFAULT_BACKCHANNEL_LOGOUT_ROUTE);
+            backChannelLogoutFilter
+                    .setBackChannelLogoutRoute(backChannelLogoutRoute);
+
+            // Adds the Back-Channel logout filter to the filter chain
+            http.addFilterAfter(backChannelLogoutFilter, LogoutFilter.class);
+
+            // Disable CSRF for Back-Channel logout requests
+            final var matcher = backChannelLogoutFilter.getRequestMatcher();
+            http.csrf().ignoringRequestMatchers(matcher);
+
+            var maximumSessions = properties.getMaximumConcurrentSessions();
+            http.sessionManagement()
+                    .sessionConcurrency(sessionConcurrencyCustomizer -> {
+                        sessionConcurrencyCustomizer
+                                .maximumSessions(maximumSessions);
+                        sessionConcurrencyCustomizer
+                                .sessionRegistry(sessionRegistry);
+                        var expiredStrategy = new UidlExpiredSessionStrategy();
+                        sessionConcurrencyCustomizer
+                                .expiredSessionStrategy(expiredStrategy);
+                    });
+        }
+
         return http.build();
     }
 }
