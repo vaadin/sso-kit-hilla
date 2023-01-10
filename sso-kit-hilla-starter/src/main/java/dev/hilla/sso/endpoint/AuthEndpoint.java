@@ -9,9 +9,12 @@
  */
 package dev.hilla.sso.endpoint;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,17 +23,25 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 
 import dev.hilla.Endpoint;
+import dev.hilla.EndpointSubscription;
+import dev.hilla.sso.starter.bclogout.FluxHolder;
+import jakarta.annotation.security.PermitAll;
 
 @Endpoint
 @AnonymousAllowed
 public class AuthEndpoint {
     private static final String ROLE_PREFIX = "ROLE_";
     private static final int ROLE_PREFIX_LENGTH = ROLE_PREFIX.length();
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(AuthEndpoint.class);
 
     private final ClientParameters clientParameters;
+    private final FluxHolder fluxHolder;
 
-    public AuthEndpoint(ClientParameters clientParameters) {
+    public AuthEndpoint(ClientParameters clientParameters,
+            FluxHolder fluxHolder) {
         this.clientParameters = clientParameters;
+        this.fluxHolder = fluxHolder;
     }
 
     // This method is not really useful since the configuration is already
@@ -57,5 +68,21 @@ public class AuthEndpoint {
                             .collect(Collectors.toSet()));
                     return user;
                 });
+    }
+
+    @PermitAll
+    public EndpointSubscription<String> backChannelLogout() {
+        LOGGER.debug("Client subscribed to back channel logout information");
+        var principal = SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
+
+        var flux = fluxHolder.getFlux().filter(p -> {
+            return Objects.equals(p, principal);
+        }).map(p -> "Your session has been terminated");
+
+        return EndpointSubscription.of(flux, () -> {
+            LOGGER.debug(
+                    "Client cancelled subscription to back channel logout information");
+        });
     }
 }

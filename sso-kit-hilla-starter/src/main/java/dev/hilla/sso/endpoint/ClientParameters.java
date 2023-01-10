@@ -16,12 +16,18 @@ import dev.hilla.sso.starter.SingleSignOnProperties;
 @Component
 public class ClientParameters {
     private final String loginURL;
+    private final boolean backChannelLogoutEnabled;
 
     public ClientParameters(SingleSignOnProperties properties) {
         loginURL = properties.getLoginRoute();
+        backChannelLogoutEnabled = properties.isBackChannelLogout();
     }
 
     public String getLoginURL() {
         return loginURL;
+    }
+
+    public boolean isBackChannelLogoutEnabled() {
+        return backChannelLogoutEnabled;
     }
 }

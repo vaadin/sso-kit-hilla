@@ -4,6 +4,7 @@ import '@vaadin/app-layout';
 import { AppLayout } from '@vaadin/app-layout';
 import '@vaadin/app-layout/vaadin-drawer-toggle';
 import '@vaadin/avatar';
+import '@vaadin/confirm-dialog';
 import '@vaadin/icon';
 import '@vaadin/menu-bar';
 import type { MenuBarItem, MenuBarItemSelectedEvent } from '@vaadin/menu-bar';
@@ -63,6 +64,15 @@ export class MainLayout extends Layout {
         <vaadin-drawer-toggle slot="navbar" aria-label="Menu toggle"></vaadin-drawer-toggle>
         <h2 slot="navbar" class="text-l m-0">${appStore.currentViewTitle}</h2>
 
+        <vaadin-confirm-dialog
+          header="Logged out"
+          cancel
+          @confirm="${() => this.doLogout('login')}"
+          .opened="${appStore.backChannelLogoutHappened}"
+        >
+          You have been logged out. Do you want to log in again?
+        </vaadin-confirm-dialog>
+
         <slot></slot>
       </vaadin-app-layout>
     `;
@@ -105,10 +115,14 @@ export class MainLayout extends Layout {
 
   private async userMenuItemSelected(e: MenuBarItemSelectedEvent) {
     if (e.detail.value.text === 'Sign out') {
-      appStore.clearUserInfo();
-      await logout();
-      location.href = '';
+      await this.doLogout('');
     }
+  }
+
+  private async doLogout(redirect: string) {
+    appStore.clearUserInfo();
+    await logout();
+    location.href = redirect;
   }
 
   private getMenuRoutes(): RouteInfo[] {
