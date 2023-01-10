@@ -80,6 +80,11 @@ public class AuthEndpoint {
                 });
     }
 
+    /**
+     * Returns the URL to call to perform a logout from the OAuth2 provider.
+     *
+     * @return the URL
+     */
     @Nullable
     public String getLogoutUrl() {
         var authentication = SecurityContextHolder.getContext()
@@ -91,6 +96,7 @@ public class AuthEndpoint {
             var logoutRedirectRoute = properties.getLogoutRedirectRoute();
             String logoutUri;
 
+            // the logout redirect route can contain a {baseUrl} placeholder
             if (logoutRedirectRoute.contains("{baseUrl}")) {
                 logoutUri = getCurrentHttpRequest()
                         .map(request -> UriComponentsBuilder
@@ -106,12 +112,15 @@ public class AuthEndpoint {
                 logoutUri = logoutRedirectRoute;
             }
 
+            // Build the logout URL according to the OpenID Connect
+            // specification
             var ou = (OidcUser) authentication.getPrincipal();
             var registrationId = ((OAuth2AuthenticationToken) authentication)
                     .getAuthorizedClientRegistrationId();
             var clientRegistration = clientRegistrationRepository
                     .findByRegistrationId(registrationId);
             var details = clientRegistration.getProviderDetails();
+            // The end_session_endpoint is buried in the provider metadata
             var endSessionEndpoint = details.getConfigurationMetadata()
                     .get("end_session_endpoint").toString();
             var builder = UriComponentsBuilder.fromUriString(endSessionEndpoint)
@@ -124,8 +133,15 @@ public class AuthEndpoint {
         return null;
     }
 
+    /**
+     * Returns the ids of the registered OAuth2 clients.
+     *
+     * @return a list of registration ids
+     */
     public List<String> getRegisteredClients() {
         return Optional.of(clientRegistrationRepository)
+                // By default, the client registration repository is an instance
+                // of InMemoryClientRegistrationRepository
                 .filter(InMemoryClientRegistrationRepository.class::isInstance)
                 .map(InMemoryClientRegistrationRepository.class::cast)
                 .map(repo -> {

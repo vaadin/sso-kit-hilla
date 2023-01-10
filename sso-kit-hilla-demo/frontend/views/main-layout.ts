@@ -106,9 +106,13 @@ export class MainLayout extends Layout {
 
   private async userMenuItemSelected(e: MenuBarItemSelectedEvent) {
     if (e.detail.value.text === 'Sign out') {
+      // Before logging out, fetch the OAuth2 logout URL from the server
       const logoutUrl = await AuthEndpoint.getLogoutUrl();
+      // Logout on the client
       appStore.clearUserInfo();
+      // Logout on the server
       await logout();
+      // Logout on the OAuth2 provider
       location.href = logoutUrl;
     }
   }

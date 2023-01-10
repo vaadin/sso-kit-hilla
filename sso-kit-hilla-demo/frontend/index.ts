@@ -12,7 +12,7 @@ declare global {
   };
 }
 
-appStore.fetchUserInfo().finally(() => {
+appStore.fetchAuthenticationInfo().finally(() => {
   // Ensure router access checks are not done before we know if we are logged in
   router.setRoutes(routes);
 });
