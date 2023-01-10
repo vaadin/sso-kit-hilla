@@ -13,6 +13,8 @@ export class AppStore {
 
   user: User | undefined = undefined;
 
+  registeredClients: string[] = [];
+
   constructor() {
     makeAutoObservable(this);
   }
@@ -35,6 +37,7 @@ export class AppStore {
 
   async fetchUserInfo() {
     this.user = await AuthEndpoint.getAuthenticatedUser();
+    this.registeredClients = await AuthEndpoint.getRegisteredClients();
   }
 
   clearUserInfo() {

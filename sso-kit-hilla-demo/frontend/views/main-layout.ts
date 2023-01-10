@@ -58,7 +58,7 @@ export class MainLayout extends Layout {
                   @item-selected="${this.userMenuItemSelected}"
                 ></vaadin-menu-bar>
               `
-            : html`<a router-ignore href="login">Sign in</a>`}
+            : appStore.registeredClients.map(client => html`<a router-ignore href="/oauth2/authorization/${client}">Sign in with ${client}</a>`)}
         </footer>
 
         <vaadin-drawer-toggle slot="navbar" aria-label="Menu toggle"></vaadin-drawer-toggle>

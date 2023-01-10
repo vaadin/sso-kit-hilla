@@ -9,6 +9,8 @@
  */
 package dev.hilla.sso.endpoint;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -19,6 +21,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.web.util.UrlUtils;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -119,6 +122,18 @@ public class AuthEndpoint {
         }
 
         return null;
+    }
+
+    public List<String> getRegisteredClients() {
+        return Optional.of(clientRegistrationRepository)
+                .filter(InMemoryClientRegistrationRepository.class::isInstance)
+                .map(InMemoryClientRegistrationRepository.class::cast)
+                .map(repo -> {
+                    List<String> list = new ArrayList<>();
+                    repo.iterator().forEachRemaining(registration -> list
+                            .add(registration.getRegistrationId()));
+                    return list;
+                }).orElse(List.of());
     }
 
     private static Optional<HttpServletRequest> getCurrentHttpRequest() {
