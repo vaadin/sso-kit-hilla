@@ -12,14 +12,24 @@ package dev.hilla.sso.endpoint;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nullable;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.security.web.util.UrlUtils;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 
 import dev.hilla.Endpoint;
+import dev.hilla.sso.starter.SingleSignOnProperties;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Endpoint
 @AnonymousAllowed
@@ -29,8 +39,16 @@ public class AuthEndpoint {
 
     private final ClientParameters clientParameters;
 
-    public AuthEndpoint(ClientParameters clientParameters) {
+    private final ClientRegistrationRepository clientRegistrationRepository;
+
+    private final SingleSignOnProperties properties;
+
+    public AuthEndpoint(ClientParameters clientParameters,
+            ClientRegistrationRepository clientRegistrationRepository,
+            SingleSignOnProperties properties) {
         this.clientParameters = clientParameters;
+        this.clientRegistrationRepository = clientRegistrationRepository;
+        this.properties = properties;
     }
 
     // This method is not really useful since the configuration is already
@@ -58,4 +76,56 @@ public class AuthEndpoint {
                     return user;
                 });
     }
+
+    @Nullable
+    public String getLogoutUrl() {
+        var authentication = SecurityContextHolder.getContext()
+                .getAuthentication();
+
+        if (authentication instanceof OAuth2AuthenticationToken
+                && authentication.getPrincipal() instanceof OidcUser) {
+
+            var logoutRedirectRoute = properties.getLogoutRedirectRoute();
+            String logoutUri;
+
+            if (logoutRedirectRoute.contains("{baseUrl}")) {
+                logoutUri = getCurrentHttpRequest()
+                        .map(request -> UriComponentsBuilder
+                                .fromHttpUrl(
+                                        UrlUtils.buildFullRequestUrl(request))
+                                .replacePath(request.getContextPath())
+                                .replaceQuery(null).fragment(null).build()
+                                .toUriString())
+                        .map(uri -> logoutRedirectRoute.replace("{baseUrl}",
+                                uri))
+                        .orElse(logoutRedirectRoute);
+            } else {
+                logoutUri = logoutRedirectRoute;
+            }
+
+            var ou = (OidcUser) authentication.getPrincipal();
+            var registrationId = ((OAuth2AuthenticationToken) authentication)
+                    .getAuthorizedClientRegistrationId();
+            var clientRegistration = clientRegistrationRepository
+                    .findByRegistrationId(registrationId);
+            var details = clientRegistration.getProviderDetails();
+            var endSessionEndpoint = details.getConfigurationMetadata()
+                    .get("end_session_endpoint").toString();
+            var builder = UriComponentsBuilder.fromUriString(endSessionEndpoint)
+                    .queryParam("id_token_hint",
+                            ou.getIdToken().getTokenValue())
+                    .queryParam("post_logout_redirect_uri", logoutUri);
+            return builder.toUriString();
+        }
+
+        return null;
+    }
+
+    private static Optional<HttpServletRequest> getCurrentHttpRequest() {
+        return Optional.ofNullable(RequestContextHolder.getRequestAttributes())
+                .filter(ServletRequestAttributes.class::isInstance)
+                .map(ServletRequestAttributes.class::cast)
+                .map(ServletRequestAttributes::getRequest);
+    }
+
 }

@@ -36,7 +36,7 @@ public class SingleSignOnProperties {
      * The default logout-redirect route. Web browsers will be redirected to
      * this route after the logout process has completed.
      */
-    static final String DEFAULT_LOGOUT_REDIRECT_ROUTE = "/";
+    static final String DEFAULT_LOGOUT_REDIRECT_ROUTE = "{baseUrl}";
 
     /**
      * Enables (or disables) auto-configuration.

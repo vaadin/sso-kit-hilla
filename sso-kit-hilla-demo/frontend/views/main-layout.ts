@@ -12,6 +12,7 @@ import '@vaadin/tabs';
 import '@vaadin/tabs/vaadin-tab';
 import '@vaadin/vaadin-lumo-styles/vaadin-iconset';
 import User from 'Frontend/generated/dev/hilla/sso/endpoint/User';
+import { AuthEndpoint } from 'Frontend/generated/endpoints';
 import { html, render } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { router } from '../index';
@@ -105,9 +106,10 @@ export class MainLayout extends Layout {
 
   private async userMenuItemSelected(e: MenuBarItemSelectedEvent) {
     if (e.detail.value.text === 'Sign out') {
+      const logoutUrl = await AuthEndpoint.getLogoutUrl();
       appStore.clearUserInfo();
       await logout();
-      location.href = '';
+      location.href = logoutUrl;
     }
   }
 

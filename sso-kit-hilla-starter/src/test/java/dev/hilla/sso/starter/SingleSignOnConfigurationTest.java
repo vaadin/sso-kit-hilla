@@ -42,8 +42,7 @@ public class SingleSignOnConfigurationTest {
                         AutoConfigurations.of(SpringBootAutoConfiguration.class,
                                 SpringSecurityAutoConfiguration.class,
                                 SingleSignOnConfiguration.class,
-                                SingleSignOnProperties.class,
-                                KeycloakLogoutHandler.class))
+                                SingleSignOnProperties.class))
                 .withPropertyValues(
                         "spring.security.oauth2.client.registration.foo.client-id=foo")
                 .withBean(ClientRegistrationRepository.class,
