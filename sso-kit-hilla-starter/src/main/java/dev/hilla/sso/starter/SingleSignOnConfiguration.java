@@ -24,7 +24,6 @@ import com.vaadin.flow.spring.security.VaadinWebSecurity;
 
 import dev.hilla.sso.starter.bclogout.BackChannelLogoutFilter;
 import dev.hilla.sso.starter.bclogout.FluxHolder;
-import dev.hilla.sso.starter.bclogout.UidlExpiredSessionStrategy;
 
 @Configuration
 @EnableWebSecurity
@@ -77,9 +76,6 @@ public class SingleSignOnConfiguration extends VaadinWebSecurity {
                                 .maximumSessions(maximumSessions);
                         sessionConcurrencyCustomizer
                                 .sessionRegistry(sessionRegistry);
-                        var expiredStrategy = new UidlExpiredSessionStrategy();
-                        sessionConcurrencyCustomizer
-                                .expiredSessionStrategy(expiredStrategy);
                     });
         }
 
