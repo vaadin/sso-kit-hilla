@@ -14,8 +14,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nullable;
-
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,6 +29,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 
 import dev.hilla.Endpoint;
+import dev.hilla.Nonnull;
 import dev.hilla.sso.starter.SingleSignOnProperties;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -40,25 +39,15 @@ public class AuthEndpoint {
     private static final String ROLE_PREFIX = "ROLE_";
     private static final int ROLE_PREFIX_LENGTH = ROLE_PREFIX.length();
 
-    private final ClientParameters clientParameters;
-
     private final ClientRegistrationRepository clientRegistrationRepository;
 
     private final SingleSignOnProperties properties;
 
-    public AuthEndpoint(ClientParameters clientParameters,
+    public AuthEndpoint(
             ClientRegistrationRepository clientRegistrationRepository,
             SingleSignOnProperties properties) {
-        this.clientParameters = clientParameters;
         this.clientRegistrationRepository = clientRegistrationRepository;
         this.properties = properties;
-    }
-
-    // This method is not really useful since the configuration is already
-    // available on the client. It exists to let Hilla translate
-    // ClientParameters to TypeScript and get code completion and type safety.
-    public ClientParameters getClientParameters() {
-        return clientParameters;
     }
 
     public Optional<User> getAuthenticatedUser() {
@@ -85,8 +74,7 @@ public class AuthEndpoint {
      *
      * @return the URL
      */
-    @Nullable
-    public String getLogoutUrl() {
+    public Optional<String> getLogoutUrl() {
         var authentication = SecurityContextHolder.getContext()
                 .getAuthentication();
 
@@ -127,10 +115,10 @@ public class AuthEndpoint {
                     .queryParam("id_token_hint",
                             ou.getIdToken().getTokenValue())
                     .queryParam("post_logout_redirect_uri", logoutUri);
-            return builder.toUriString();
+            return Optional.of(builder.toUriString());
         }
 
-        return null;
+        return Optional.empty();
     }
 
     /**
@@ -138,7 +126,8 @@ public class AuthEndpoint {
      *
      * @return a list of registration ids
      */
-    public List<String> getRegisteredClients() {
+    @Nonnull
+    public List<@Nonnull String> getRegisteredClients() {
         return Optional.of(clientRegistrationRepository)
                 // By default, the client registration repository is an instance
                 // of InMemoryClientRegistrationRepository

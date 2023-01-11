@@ -113,7 +113,7 @@ export class MainLayout extends Layout {
       // Logout on the server
       await logout();
       // Logout on the OAuth2 provider
-      location.href = logoutUrl;
+      logoutUrl && (location.href = logoutUrl);
     }
   }
 
