@@ -14,8 +14,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,21 +32,37 @@ import dev.hilla.Endpoint;
 import dev.hilla.Nonnull;
 import dev.hilla.sso.starter.SingleSignOnProperties;
 
+import java.util.Objects;
+
+import javax.annotation.security.PermitAll;
+import javax.servlet.http.HttpServletRequest;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import dev.hilla.EndpointSubscription;
+import dev.hilla.sso.starter.bclogout.FluxHolder;
+
 @Endpoint
 @AnonymousAllowed
 public class AuthEndpoint {
     private static final String ROLE_PREFIX = "ROLE_";
     private static final int ROLE_PREFIX_LENGTH = ROLE_PREFIX.length();
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(AuthEndpoint.class);
 
     private final ClientRegistrationRepository clientRegistrationRepository;
 
     private final SingleSignOnProperties properties;
 
+    private final FluxHolder fluxHolder;
+
     public AuthEndpoint(
             ClientRegistrationRepository clientRegistrationRepository,
-            SingleSignOnProperties properties) {
+            SingleSignOnProperties properties, FluxHolder fluxHolder) {
         this.clientRegistrationRepository = clientRegistrationRepository;
         this.properties = properties;
+        this.fluxHolder = fluxHolder;
     }
 
     public Optional<User> getAuthenticatedUser() {
@@ -149,4 +163,20 @@ public class AuthEndpoint {
                 .map(ServletRequestAttributes::getRequest);
     }
 
+    @PermitAll
+    @Nonnull
+    public EndpointSubscription<@Nonnull String> backChannelLogout() {
+        LOGGER.debug("Client subscribed to back channel logout information");
+        var principal = SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
+
+        var flux = fluxHolder.getFlux().filter(p -> {
+            return Objects.equals(p, principal);
+        }).map(p -> "Your session has been terminated");
+
+        return EndpointSubscription.of(flux, () -> {
+            LOGGER.debug(
+                    "Client cancelled subscription to back channel logout information");
+        });
+    }
 }
