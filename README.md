@@ -86,8 +86,11 @@ Inside the `AppStore` class in `app-store.ts` add this code:
 ```typescript
 user: User | undefined = undefined;
 
-async fetchUserInfo() {
+registeredClients: string[] = [];
+
+async fetchAuthenticationInfo() {
   this.user = await AuthEndpoint.getAuthenticatedUser();
+  this.registeredClients = await AuthEndpoint.getRegisteredClients();
 }
 
 clearUserInfo() {
@@ -105,21 +108,10 @@ isUserInRole(role: string) {
 
 You should be able to add the missing imports automatically.
 
-Open the `frontend/index.ts` file and add this TypeScript declaration to allow easier access to configuration parameters:
+Open the `frontend/index.ts` file and delay the router setup until the login information has been fetched by wrapping the `setRoutes` call as follows:
 
 ```typescript
-// Creates a type for the global Hilla object which is defined in index.html
-declare global {
-  const Hilla: {
-    SSO: ClientParameters;
-  };
-}
-```
-
-Also, delay the router setup until the login information has been fetched by wrapping the `setRoutes` call as follows:
-
-```typescript
-appStore.fetchUserInfo().finally(() => {
+appStore.fetchAuthenticationInfo().finally(() => {
   // Ensure router access checks are not done before we know if we are logged in
   router.setRoutes(routes);
 });
@@ -174,7 +166,7 @@ Modify the `hello` path so that it requires login and redirects to the SSO Login
 },
 ```
 
-Add a `login` route to the exported routes:
+Add a `login` route to the exported routes (will use the first registered provider in this example):
 
 ```typescript
 {
@@ -182,7 +174,7 @@ Add a `login` route to the exported routes:
   icon: '',
   title: 'Login',
   action: async (_context, _command) => {
-    location.href = Hilla.SSO.loginURL;
+    location.href = `/oauth2/authorization/${appStore.registeredClients[0]}`;
   },
 },
 ```
@@ -203,6 +195,12 @@ Open `frontend/views/main-layout.ts` and add a login/logout button in the `foote
       `
     : html`<a router-ignore href="login">Sign in</a>`}
 </footer>
+```
+
+You can replace the `Sign in` link above with multiple links if you have multiple providers:
+
+```typescript
+appStore.registeredClients.map(client => html`<a router-ignore href="/oauth2/authorization/${client}">Sign in with ${client}</a>`)}
 ```
 
 Add the needed functions:
@@ -234,9 +232,10 @@ private createUserMenuItem(user: User) {
 
 private async userMenuItemSelected(e: MenuBarItemSelectedEvent) {
   if (e.detail.value.text === 'Sign out') {
+    const logoutUrl = await AuthEndpoint.getLogoutUrl();
     appStore.clearUserInfo();
     await logout();
-    location.href = '';
+    logoutUrl && (location.href = logoutUrl);
   }
 }
 ```
