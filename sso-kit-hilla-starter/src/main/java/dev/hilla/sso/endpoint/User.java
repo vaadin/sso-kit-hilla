@@ -17,10 +17,15 @@ public class User {
 
     @Nonnull
     private String username;
+
+    private String fullName;
+
+    private String email;
+
+    private String picture;
+
     @Nonnull
-    private String name;
-    @Nonnull
-    private Set<String> roles;
+    private Set<String> roles = Set.of();
 
     public String getUsername() {
         return username;
@@ -30,19 +35,35 @@ public class User {
         this.username = username;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public Set<String> getRoles() {
         return roles;
     }
 
     public void setRoles(Set<String> roles) {
         this.roles = roles;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPicture() {
+        return picture;
+    }
+
+    public void setPicture(String picture) {
+        this.picture = picture;
     }
 }
