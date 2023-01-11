@@ -54,7 +54,7 @@ export const routes: ViewRoute[] = [
     icon: '',
     title: 'Login',
     action: async (_context, _command) => {
-      location.href = Hilla.SSO.loginURL;
+      location.href = `/oauth2/authorization/${appStore.registeredClients[0]}`;
     },
   },
   {

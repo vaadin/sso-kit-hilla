@@ -13,6 +13,10 @@ export class AppStore {
 
   user: User | undefined = undefined;
 
+  // A list of authentication providers. You can build the login URL as
+  // `/oauth2/authorization/${client}` for each element in this array.
+  registeredClients: string[] = [];
+
   constructor() {
     makeAutoObservable(this);
   }
@@ -33,8 +37,11 @@ export class AppStore {
     }
   }
 
-  async fetchUserInfo() {
+  async fetchAuthenticationInfo() {
+    // Fetch the logged in user (can be null if not logged in)
     this.user = await AuthEndpoint.getAuthenticatedUser();
+    // Fetch the list of registered OAuth2 clients
+    this.registeredClients = await AuthEndpoint.getRegisteredClients();
   }
 
   clearUserInfo() {

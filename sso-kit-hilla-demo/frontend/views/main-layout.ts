@@ -12,6 +12,7 @@ import '@vaadin/tabs';
 import '@vaadin/tabs/vaadin-tab';
 import '@vaadin/vaadin-lumo-styles/vaadin-iconset';
 import User from 'Frontend/generated/dev/hilla/sso/endpoint/User';
+import { AuthEndpoint } from 'Frontend/generated/endpoints';
 import { html, render } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { router } from '../index';
@@ -57,7 +58,7 @@ export class MainLayout extends Layout {
                   @item-selected="${this.userMenuItemSelected}"
                 ></vaadin-menu-bar>
               `
-            : html`<a router-ignore href="login">Sign in</a>`}
+            : appStore.registeredClients.map(client => html`<a router-ignore href="/oauth2/authorization/${client}">Sign in with ${client}</a>`)}
         </footer>
 
         <vaadin-drawer-toggle slot="navbar" aria-label="Menu toggle"></vaadin-drawer-toggle>
@@ -105,9 +106,14 @@ export class MainLayout extends Layout {
 
   private async userMenuItemSelected(e: MenuBarItemSelectedEvent) {
     if (e.detail.value.text === 'Sign out') {
+      // Before logging out, fetch the OAuth2 logout URL from the server
+      const logoutUrl = await AuthEndpoint.getLogoutUrl();
+      // Logout on the client
       appStore.clearUserInfo();
+      // Logout on the server
       await logout();
-      location.href = '';
+      // Logout on the OAuth2 provider
+      logoutUrl && (location.href = logoutUrl);
     }
   }
 
