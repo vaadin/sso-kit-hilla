@@ -107,7 +107,7 @@ export class MainLayout extends Layout {
     item.style.gap = 'var(--lumo-space-s)';
     render(
       html`
-        <span>${user.name}</span>
+        <span>${user.fullName}</span>
         <vaadin-icon icon="lumo:dropdown"></vaadin-icon>
       `,
       item
