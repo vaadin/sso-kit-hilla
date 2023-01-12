@@ -14,7 +14,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -33,21 +36,32 @@ import dev.hilla.Nonnull;
 import dev.hilla.sso.starter.SingleSignOnProperties;
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.util.Objects;
+
+import dev.hilla.EndpointSubscription;
+import dev.hilla.sso.starter.bclogout.FluxHolder;
+import jakarta.annotation.security.PermitAll;
+
 @Endpoint
 @AnonymousAllowed
 public class AuthEndpoint {
     private static final String ROLE_PREFIX = "ROLE_";
     private static final int ROLE_PREFIX_LENGTH = ROLE_PREFIX.length();
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(AuthEndpoint.class);
 
     private final ClientRegistrationRepository clientRegistrationRepository;
 
     private final SingleSignOnProperties properties;
 
+    private final FluxHolder fluxHolder;
+
     public AuthEndpoint(
             ClientRegistrationRepository clientRegistrationRepository,
-            SingleSignOnProperties properties) {
+            SingleSignOnProperties properties, FluxHolder fluxHolder) {
         this.clientRegistrationRepository = clientRegistrationRepository;
         this.properties = properties;
+        this.fluxHolder = fluxHolder;
     }
 
     public Optional<User> getAuthenticatedUser() {
@@ -61,7 +75,7 @@ public class AuthEndpoint {
                     user.setUsername(ou.getUserInfo()
                             .getClaimAsString("preferred_username"));
                     user.setRoles(ou.getAuthorities().stream()
-                            .map(a -> a.getAuthority())
+                            .map(GrantedAuthority::getAuthority)
                             .filter(a -> a.startsWith(ROLE_PREFIX))
                             .map(a -> a.substring(ROLE_PREFIX_LENGTH))
                             .collect(Collectors.toSet()));
@@ -148,4 +162,20 @@ public class AuthEndpoint {
                 .map(ServletRequestAttributes::getRequest);
     }
 
+    @PermitAll
+    @Nonnull
+    public EndpointSubscription<@Nonnull String> backChannelLogout() {
+        LOGGER.debug("Client subscribed to back channel logout information");
+        var principal = SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
+
+        var flux = fluxHolder.getFlux()
+                .filter(p -> Objects.equals(p, principal))
+                .map(p -> "Your session has been terminated");
+
+        return EndpointSubscription.of(flux, () -> {
+            LOGGER.debug(
+                    "Client cancelled subscription to back channel logout information");
+        });
+    }
 }

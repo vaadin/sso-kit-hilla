@@ -4,6 +4,7 @@ import '@vaadin/app-layout';
 import { AppLayout } from '@vaadin/app-layout';
 import '@vaadin/app-layout/vaadin-drawer-toggle';
 import '@vaadin/avatar';
+import '@vaadin/confirm-dialog';
 import '@vaadin/icon';
 import '@vaadin/menu-bar';
 import type { MenuBarItem, MenuBarItemSelectedEvent } from '@vaadin/menu-bar';
@@ -64,6 +65,16 @@ export class MainLayout extends Layout {
         <vaadin-drawer-toggle slot="navbar" aria-label="Menu toggle"></vaadin-drawer-toggle>
         <h2 slot="navbar" class="text-l m-0">${appStore.currentViewTitle}</h2>
 
+        <vaadin-confirm-dialog
+          header="Logged out"
+          cancel
+          @confirm="${() => this.doLogout('login')}"
+          .opened="${appStore.backChannelLogoutHappened}"
+        >
+          <p>You have been logged out. Do you want to log in again?</p>
+          <p>If you click on "Cancel", the application will not work correctly until you log in again.</p>
+        </vaadin-confirm-dialog>
+
         <slot></slot>
       </vaadin-app-layout>
     `;
@@ -106,15 +117,25 @@ export class MainLayout extends Layout {
 
   private async userMenuItemSelected(e: MenuBarItemSelectedEvent) {
     if (e.detail.value.text === 'Sign out') {
-      // Before logging out, fetch the OAuth2 logout URL from the server
-      const logoutUrl = await AuthEndpoint.getLogoutUrl();
-      // Logout on the client
-      appStore.clearUserInfo();
-      // Logout on the server
-      await logout();
-      // Logout on the OAuth2 provider
-      logoutUrl && (location.href = logoutUrl);
+      await this.doLogout();
     }
+  }
+
+  /**
+   * Performs logout. A redirect can only be specified if no SSO logout is needed.
+   * 
+   * @param redirect The redirect URL to use, otherwise the OAuth2 logout URL is used
+   */
+  private async doLogout(redirect: string | undefined = undefined) {
+    // If no redirect is specified, fetch the OAuth2 logout URL from the server
+    const logoutUrl = !redirect && await AuthEndpoint.getLogoutUrl();
+    // Logout on the client
+    appStore.clearUserInfo();
+    // Logout on the server
+    await logout();
+    // Redirect to either the specified redirect or the OAuth2 logout URL
+    const redirectUrl = logoutUrl || redirect;
+    redirectUrl && (location.href = redirectUrl);
   }
 
   private getMenuRoutes(): RouteInfo[] {

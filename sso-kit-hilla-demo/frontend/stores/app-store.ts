@@ -1,3 +1,4 @@
+import { Subscription } from '@hilla/frontend';
 import { RouterLocation } from '@vaadin/router';
 import User from 'Frontend/generated/dev/hilla/sso/endpoint/User';
 import { AuthEndpoint } from 'Frontend/generated/endpoints';
@@ -16,6 +17,10 @@ export class AppStore {
   // A list of authentication providers. You can build the login URL as
   // `/oauth2/authorization/${client}` for each element in this array.
   registeredClients: string[] = [];
+
+  private logoutSubscription: Subscription<string> | undefined;
+
+  backChannelLogoutHappened: boolean = false;
 
   constructor() {
     makeAutoObservable(this);
@@ -40,12 +45,27 @@ export class AppStore {
   async fetchAuthenticationInfo() {
     // Fetch the logged in user (can be null if not logged in)
     this.user = await AuthEndpoint.getAuthenticatedUser();
+
+    if (this.user) {
+      this.logoutSubscription = await AuthEndpoint.backChannelLogout();
+
+      this.logoutSubscription.onNext(async () => {
+        this.backChannelLogoutHappened = true;
+      });
+    }
+
     // Fetch the list of registered OAuth2 clients
     this.registeredClients = await AuthEndpoint.getRegisteredClients();
   }
 
   clearUserInfo() {
     this.user = undefined;
+    this.backChannelLogoutHappened = false;
+
+    if (this.logoutSubscription) {
+      this.logoutSubscription.cancel();
+      this.logoutSubscription = undefined;
+    }
   }
 
   get loggedIn() {

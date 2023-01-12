@@ -11,6 +11,8 @@ package dev.hilla.sso.starter;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import dev.hilla.sso.starter.bclogout.BackChannelLogoutFilter;
+
 /**
  * Definition of configuration properties for the SSO Kit Hilla starter.
  *
@@ -39,9 +41,21 @@ public class SingleSignOnProperties {
     static final String DEFAULT_LOGOUT_REDIRECT_ROUTE = "{baseUrl}";
 
     /**
-     * Enables (or disables) auto-configuration.
+     * The default maximum number of concurrent sessions allowed per user: -1
+     * means any number of concurrent sessions is allowed.
      */
-    private boolean autoConfigure = true;
+    static final int DEFAULT_MAXIMUM_SESSIONS_PER_USER = -1;
+
+    /**
+     * The default Back-Channel Logout route. This should be the same as in the
+     * OIDC provider's configuration to be able to accept logout notices as
+     * described by the specification. It requires a URI variable to match the
+     * client registration-id: {@code registrationId}.
+     *
+     * @see https://openid.net/specs/openid-connect-backchannel-1_0.html
+     */
+    public static final String DEFAULT_BACKCHANNEL_LOGOUT_ROUTE = "/logout/back-channel/{"
+            + BackChannelLogoutFilter.REGISTRATION_ID_URI_VARIABLE_NAME + "}";
 
     /**
      * The route to redirect unauthorized requests to.
@@ -54,26 +68,21 @@ public class SingleSignOnProperties {
     private String logoutRedirectRoute = DEFAULT_LOGOUT_REDIRECT_ROUTE;
 
     /**
-     * Checks is auto-configuration of {@link SingleSignOnConfiguration} is
-     * enabled.
-     *
-     * @return true, if auto-configuration is enabled
+     * If set to {@code true} it enables support for Back-Channel logout.
      */
-    public boolean isAutoConfigure() {
-        return autoConfigure;
-    }
+    private boolean backChannelLogout = false;
 
     /**
-     * Enables or disables auto-configuration of
-     * {@link SingleSignOnConfiguration}.
-     *
-     * @param autoConfigure
-     *            {@code true} to enable auto-configuration, {@code false} to
-     *            disable
+     * The route to match Back-Channel logout requests against. The default
+     * value is {@code /logout/back-channel/{registration-id}}.
      */
-    public void setAutoConfigure(boolean autoConfigure) {
-        this.autoConfigure = autoConfigure;
-    }
+    private String backChannelLogoutRoute = DEFAULT_BACKCHANNEL_LOGOUT_ROUTE;
+
+    /**
+     * The number of maximum concurrent sessions allowed per user. The default
+     * value is -1 which means any number of concurrent sessions is allowed.
+     */
+    private int maximumConcurrentSessions = DEFAULT_MAXIMUM_SESSIONS_PER_USER;
 
     /**
      * Gets the login-route property.
@@ -111,5 +120,63 @@ public class SingleSignOnProperties {
      */
     public void setLogoutRedirectRoute(String logoutRedirectRoute) {
         this.logoutRedirectRoute = logoutRedirectRoute;
+    }
+
+    /**
+     * Checks weather Back-Channel logout is enabled.
+     *
+     * @return {@code true} if Back-Channel logout is enabled, {@code false}
+     *         otherwise
+     */
+    public boolean isBackChannelLogout() {
+        return backChannelLogout;
+    }
+
+    /**
+     * Sets is Back-Channel logout is enabled.
+     *
+     * @param backChannelLogout
+     *            weather to enable or disable Back-Channel logout
+     */
+    public void setBackChannelLogout(boolean backChannelLogout) {
+        this.backChannelLogout = backChannelLogout;
+    }
+
+    /**
+     * Gets the Back-Channel Logout route.
+     *
+     * @return the Back-Channel Logout route
+     */
+    public String getBackChannelLogoutRoute() {
+        return backChannelLogoutRoute;
+    }
+
+    /**
+     * Sets the Back-Channel Logout route.
+     *
+     * @param backChannelLogoutRoute
+     *            the Back-Channel Logout route
+     */
+    public void setBackChannelLogoutRoute(String backChannelLogoutRoute) {
+        this.backChannelLogoutRoute = backChannelLogoutRoute;
+    }
+
+    /**
+     * Gets the maximum number of concurrent sessions per user.
+     *
+     * @return the maximum number of concurrent sessions
+     */
+    public int getMaximumConcurrentSessions() {
+        return maximumConcurrentSessions;
+    }
+
+    /**
+     * Sets maximum number of concurrent sessions per user.
+     *
+     * @param maximumConcurrentSessions
+     *            maximum number of concurrent sessions
+     */
+    public void setMaximumConcurrentSessions(int maximumConcurrentSessions) {
+        this.maximumConcurrentSessions = maximumConcurrentSessions;
     }
 }
