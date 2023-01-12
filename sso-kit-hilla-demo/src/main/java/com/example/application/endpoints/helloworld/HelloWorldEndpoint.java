@@ -1,5 +1,7 @@
 package com.example.application.endpoints.helloworld;
 
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+
 import dev.hilla.Endpoint;
 import dev.hilla.sso.endpoint.AuthEndpoint;
 import jakarta.annotation.security.PermitAll;
@@ -8,16 +10,10 @@ import jakarta.annotation.security.PermitAll;
 @PermitAll
 public class HelloWorldEndpoint {
 
-    private final AuthEndpoint authEndpoint;
-
-    public HelloWorldEndpoint(AuthEndpoint authEndpoint) {
-        this.authEndpoint = authEndpoint;
-    }
-
     public String sayHello(String name) {
         if (name.isEmpty()) {
-            return "Hello "
-                    + authEndpoint.getAuthenticatedUser().get().getFullName();
+            return "Hello " + AuthEndpoint.getOidcUser()
+                    .map(OidcUser::getFullName).orElse("anonymous");
         } else {
             return "Hello " + name;
         }

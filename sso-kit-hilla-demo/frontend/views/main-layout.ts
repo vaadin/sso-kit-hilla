@@ -59,7 +59,9 @@ export class MainLayout extends Layout {
                   @item-selected="${this.userMenuItemSelected}"
                 ></vaadin-menu-bar>
               `
-            : appStore.registeredClients.map(client => html`<a router-ignore href="/oauth2/authorization/${client}">Sign in with ${client}</a>`)}
+            : appStore.registeredProviders.map(
+              client => html`<a router-ignore href="/oauth2/authorization/${client}">Sign in with ${client}</a>`
+            )}
         </footer>
 
         <vaadin-drawer-toggle slot="navbar" aria-label="Menu toggle"></vaadin-drawer-toggle>
@@ -68,7 +70,7 @@ export class MainLayout extends Layout {
         <vaadin-confirm-dialog
           header="Logged out"
           cancel
-          @confirm="${() => this.doLogout('login')}"
+          @confirm="${this.doClientLogout}"
           .opened="${appStore.backChannelLogoutHappened}"
         >
           <p>You have been logged out. Do you want to log in again?</p>
@@ -117,25 +119,14 @@ export class MainLayout extends Layout {
 
   private async userMenuItemSelected(e: MenuBarItemSelectedEvent) {
     if (e.detail.value.text === 'Sign out') {
-      await this.doLogout();
+      await logout(); // Logout on the server
+      appStore.logoutUrl && (location.href = appStore.logoutUrl); // Logout on the provider
     }
   }
 
-  /**
-   * Performs logout. A redirect can only be specified if no SSO logout is needed.
-   * 
-   * @param redirect The redirect URL to use, otherwise the OAuth2 logout URL is used
-   */
-  private async doLogout(redirect: string | undefined = undefined) {
-    // If no redirect is specified, fetch the OAuth2 logout URL from the server
-    const logoutUrl = !redirect && await AuthEndpoint.getLogoutUrl();
-    // Logout on the client
-    appStore.clearUserInfo();
-    // Logout on the server
-    await logout();
-    // Redirect to either the specified redirect or the OAuth2 logout URL
-    const redirectUrl = logoutUrl || redirect;
-    redirectUrl && (location.href = redirectUrl);
+  private async doClientLogout() {
+    appStore.clearUserInfo(); // Logout on the client
+    await logout(); // Logout on the server
   }
 
   private getMenuRoutes(): RouteInfo[] {
