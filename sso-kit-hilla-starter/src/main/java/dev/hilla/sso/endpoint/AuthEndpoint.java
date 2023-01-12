@@ -47,6 +47,7 @@ import dev.hilla.sso.starter.bclogout.FluxHolder;
 @Endpoint
 @AnonymousAllowed
 public class AuthEndpoint {
+
     private static final String ROLE_PREFIX = "ROLE_";
     private static final int ROLE_PREFIX_LENGTH = ROLE_PREFIX.length();
     private static final Logger LOGGER = LoggerFactory
@@ -66,38 +67,82 @@ public class AuthEndpoint {
         this.fluxHolder = fluxHolder;
     }
 
-    public Optional<User> getAuthenticatedUser() {
-        return Optional.of(SecurityContextHolder.getContext())
-                .map(SecurityContext::getAuthentication)
-                .map(Authentication::getPrincipal)
-                .filter(OidcUser.class::isInstance).map(OidcUser.class::cast)
-                .map(ou -> {
-                    User user = new User();
-                    user.setFullName(ou.getFullName());
-                    user.setUsername(ou.getPreferredUsername());
-                    user.setEmail(ou.getEmail());
-                    user.setPicture(ou.getPicture());
-                    user.setRoles(ou.getAuthorities().stream()
-                            .map(GrantedAuthority::getAuthority)
-                            .filter(a -> a.startsWith(ROLE_PREFIX))
-                            .map(a -> a.substring(ROLE_PREFIX_LENGTH))
-                            .collect(Collectors.toSet()));
-                    return user;
-                });
+    @Nonnull
+    public AuthInfo getAuthInfo() {
+        AuthInfo authInfo = new AuthInfo();
+        authInfo.setRegisteredProviders(getRegisteredProviders());
+
+        getOidcUser().ifPresent(u -> {
+            authInfo.setUser(Optional.of(getAuthenticatedUser(u)));
+            authInfo.setLogoutUrl(Optional.ofNullable(getLogoutUrl(u)));
+            authInfo.setBackChannelLogoutEnabled(
+                    properties.isBackChannelLogout());
+        });
+
+        return authInfo;
     }
 
-    /**
-     * Returns the URL to call to perform a logout from the OAuth2 provider.
-     *
-     * @return the URL
-     */
-    public Optional<String> getLogoutUrl() {
+    @PermitAll
+    @Nonnull
+    public EndpointSubscription<@Nonnull String> backChannelLogout() {
+        LOGGER.debug("Client subscribed to back channel logout information");
+        var principal = SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
+
+        var flux = fluxHolder.getFlux()
+                .filter(p -> Objects.equals(p, principal))
+                .map(p -> "Your session has been terminated");
+
+        return EndpointSubscription.of(flux, () -> {
+            LOGGER.debug(
+                    "Client cancelled subscription to back channel logout information");
+        });
+    }
+
+    @Nonnull
+    private List<@Nonnull String> getRegisteredProviders() {
+        return Optional.of(clientRegistrationRepository)
+                // By default, the client registration repository is an instance
+                // of InMemoryClientRegistrationRepository
+                .filter(InMemoryClientRegistrationRepository.class::isInstance)
+                .map(InMemoryClientRegistrationRepository.class::cast)
+                .map(repo -> {
+                    List<String> list = new ArrayList<>();
+                    repo.iterator().forEachRemaining(registration -> list
+                            .add(registration.getRegistrationId()));
+                    return list;
+                }).orElse(List.of());
+    }
+
+    @Nonnull
+    private User getAuthenticatedUser(OidcUser ou) {
+        User user = new User();
+        user.setBirthdate(ou.getBirthdate());
+        user.setEmail(ou.getEmail());
+        user.setFamilyName(ou.getFamilyName());
+        user.setFullName(ou.getFullName());
+        user.setGender(ou.getGender());
+        user.setGivenName(ou.getGivenName());
+        user.setLocale(ou.getLocale());
+        user.setMiddleName(ou.getMiddleName());
+        user.setNickName(ou.getNickName());
+        user.setPhoneNumber(ou.getPhoneNumber());
+        user.setPicture(ou.getPicture());
+        user.setPreferredUsername(ou.getPreferredUsername());
+
+        user.setRoles(
+                ou.getAuthorities().stream().map(GrantedAuthority::getAuthority)
+                        .filter(a -> a.startsWith(ROLE_PREFIX))
+                        .map(a -> a.substring(ROLE_PREFIX_LENGTH))
+                        .collect(Collectors.toSet()));
+        return user;
+    }
+
+    private String getLogoutUrl(OidcUser ou) {
         var authentication = SecurityContextHolder.getContext()
                 .getAuthentication();
 
-        if (authentication instanceof OAuth2AuthenticationToken
-                && authentication.getPrincipal() instanceof OidcUser) {
-
+        if (authentication instanceof OAuth2AuthenticationToken) {
             var logoutRedirectRoute = properties.getLogoutRedirectRoute();
             String logoutUri;
 
@@ -119,7 +164,6 @@ public class AuthEndpoint {
 
             // Build the logout URL according to the OpenID Connect
             // specification
-            var ou = (OidcUser) authentication.getPrincipal();
             var registrationId = ((OAuth2AuthenticationToken) authentication)
                     .getAuthorizedClientRegistrationId();
             var clientRegistration = clientRegistrationRepository
@@ -132,30 +176,17 @@ public class AuthEndpoint {
                     .queryParam("id_token_hint",
                             ou.getIdToken().getTokenValue())
                     .queryParam("post_logout_redirect_uri", logoutUri);
-            return Optional.of(builder.toUriString());
+            return builder.toUriString();
         }
 
-        return Optional.empty();
+        return null;
     }
 
-    /**
-     * Returns the ids of the registered OAuth2 clients.
-     *
-     * @return a list of registration ids
-     */
-    @Nonnull
-    public List<@Nonnull String> getRegisteredClients() {
-        return Optional.of(clientRegistrationRepository)
-                // By default, the client registration repository is an instance
-                // of InMemoryClientRegistrationRepository
-                .filter(InMemoryClientRegistrationRepository.class::isInstance)
-                .map(InMemoryClientRegistrationRepository.class::cast)
-                .map(repo -> {
-                    List<String> list = new ArrayList<>();
-                    repo.iterator().forEachRemaining(registration -> list
-                            .add(registration.getRegistrationId()));
-                    return list;
-                }).orElse(List.of());
+    public static Optional<OidcUser> getOidcUser() {
+        return Optional.of(SecurityContextHolder.getContext())
+                .map(SecurityContext::getAuthentication)
+                .map(Authentication::getPrincipal)
+                .filter(OidcUser.class::isInstance).map(OidcUser.class::cast);
     }
 
     private static Optional<HttpServletRequest> getCurrentHttpRequest() {
@@ -163,22 +194,5 @@ public class AuthEndpoint {
                 .filter(ServletRequestAttributes.class::isInstance)
                 .map(ServletRequestAttributes.class::cast)
                 .map(ServletRequestAttributes::getRequest);
-    }
-
-    @PermitAll
-    @Nonnull
-    public EndpointSubscription<@Nonnull String> backChannelLogout() {
-        LOGGER.debug("Client subscribed to back channel logout information");
-        var principal = SecurityContextHolder.getContext().getAuthentication()
-                .getPrincipal();
-
-        var flux = fluxHolder.getFlux()
-                .filter(p -> Objects.equals(p, principal))
-                .map(p -> "Your session has been terminated");
-
-        return EndpointSubscription.of(flux, () -> {
-            LOGGER.debug(
-                    "Client cancelled subscription to back channel logout information");
-        });
     }
 }
