@@ -68,12 +68,13 @@ public class AuthEndpoint {
         return Optional.of(SecurityContextHolder.getContext())
                 .map(SecurityContext::getAuthentication)
                 .map(Authentication::getPrincipal)
-                .filter(OidcUser.class::isInstance).map(p -> (OidcUser) p)
+                .filter(OidcUser.class::isInstance).map(OidcUser.class::cast)
                 .map(ou -> {
                     User user = new User();
-                    user.setName(ou.getUserInfo().getClaimAsString("name"));
-                    user.setUsername(ou.getUserInfo()
-                            .getClaimAsString("preferred_username"));
+                    user.setFullName(ou.getFullName());
+                    user.setUsername(ou.getPreferredUsername());
+                    user.setEmail(ou.getEmail());
+                    user.setPicture(ou.getPicture());
                     user.setRoles(ou.getAuthorities().stream()
                             .map(GrantedAuthority::getAuthority)
                             .filter(a -> a.startsWith(ROLE_PREFIX))
