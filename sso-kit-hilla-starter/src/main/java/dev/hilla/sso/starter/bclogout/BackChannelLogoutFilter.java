@@ -59,7 +59,7 @@ public class BackChannelLogoutFilter extends GenericFilterBean {
     private RequestMatcher requestMatcher = new AntPathRequestMatcher(
             SingleSignOnProperties.DEFAULT_BACKCHANNEL_LOGOUT_ROUTE);
 
-    private FluxHolder fluxHolder;
+    private final FluxHolder fluxHolder;
 
     /**
      * Creates an instance of the filter.

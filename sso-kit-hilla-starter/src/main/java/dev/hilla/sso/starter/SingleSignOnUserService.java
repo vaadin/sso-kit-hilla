@@ -1,3 +1,12 @@
+/*-
+ * Copyright (C) 2022 Vaadin Ltd
+ *
+ * This program is available under Vaadin Commercial License and Service Terms.
+ *
+ *
+ * See <https://vaadin.com/commercial-license-and-service-terms> for the full
+ * license.
+ */
 package dev.hilla.sso.starter;
 
 import java.util.Collection;
@@ -36,9 +45,8 @@ public class SingleSignOnUserService extends OidcUserService {
         final var userInfo = user.getUserInfo();
         final var idToken = userRequest.getIdToken();
 
-        final var authorities = new HashSet<GrantedAuthority>();
-
-        authorities.addAll(user.getAuthorities());
+        final var authorities = new HashSet<GrantedAuthority>(
+                user.getAuthorities());
 
         if (userInfo.hasClaim(REALM_ACCESS_CLAIM)) {
             final var keycloakRoles = getKeycloakRoles(userInfo, idToken);

@@ -14,8 +14,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 
 import dev.hilla.sso.starter.bclogout.FluxHolder;
 
@@ -44,10 +42,4 @@ public class SingleSignOnDefaultBeans {
     public FluxHolder getFluxSinkHolder() {
         return new FluxHolder();
     }
-
-    // @Bean
-    // @ConditionalOnMissingBean
-    // public ClientRegistrationRepository getClientRegistrationRepository() {
-    // return new InMemoryClientRegistrationRepository();
-    // }
 }
