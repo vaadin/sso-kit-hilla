@@ -13,7 +13,6 @@ import '@vaadin/tabs';
 import '@vaadin/tabs/vaadin-tab';
 import '@vaadin/vaadin-lumo-styles/vaadin-iconset';
 import User from 'Frontend/generated/dev/hilla/sso/endpoint/User';
-import { AuthEndpoint } from 'Frontend/generated/endpoints';
 import { html, render } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { router } from '../index';
@@ -70,7 +69,8 @@ export class MainLayout extends Layout {
         <vaadin-confirm-dialog
           header="Logged out"
           cancel
-          @confirm="${this.doClientLogout}"
+          @confirm="${() => this.afterLogout(true)}"
+          @cancel="${() => this.afterLogout(false)}"
           .opened="${appStore.backChannelLogoutHappened}"
         >
           <p>You have been logged out. Do you want to log in again?</p>
@@ -124,9 +124,13 @@ export class MainLayout extends Layout {
     }
   }
 
-  private async doClientLogout() {
-    appStore.clearUserInfo(); // Logout on the client
-    await logout(); // Logout on the server
+  private async afterLogout(loginAgain: boolean) {
+    if (loginAgain) {
+      location.href = `/oauth2/authorization/${appStore.registeredProviders[0]}`;
+    } else {
+      await logout(); // Logout on the server
+      appStore.clearUserInfo(); // Logout on the client
+    }
   }
 
   private getMenuRoutes(): RouteInfo[] {
