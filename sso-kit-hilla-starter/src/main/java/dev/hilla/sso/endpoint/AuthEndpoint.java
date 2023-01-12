@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -74,7 +75,7 @@ public class AuthEndpoint {
                     user.setUsername(ou.getUserInfo()
                             .getClaimAsString("preferred_username"));
                     user.setRoles(ou.getAuthorities().stream()
-                            .map(a -> a.getAuthority())
+                            .map(GrantedAuthority::getAuthority)
                             .filter(a -> a.startsWith(ROLE_PREFIX))
                             .map(a -> a.substring(ROLE_PREFIX_LENGTH))
                             .collect(Collectors.toSet()));
@@ -168,9 +169,9 @@ public class AuthEndpoint {
         var principal = SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
 
-        var flux = fluxHolder.getFlux().filter(p -> {
-            return Objects.equals(p, principal);
-        }).map(p -> "Your session has been terminated");
+        var flux = fluxHolder.getFlux()
+                .filter(p -> Objects.equals(p, principal))
+                .map(p -> "Your session has been terminated");
 
         return EndpointSubscription.of(flux, () -> {
             LOGGER.debug(

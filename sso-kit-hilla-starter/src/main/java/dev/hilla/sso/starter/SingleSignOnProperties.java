@@ -58,11 +58,6 @@ public class SingleSignOnProperties {
             + BackChannelLogoutFilter.REGISTRATION_ID_URI_VARIABLE_NAME + "}";
 
     /**
-     * Enables (or disables) auto-configuration.
-     */
-    private boolean autoConfigure = true;
-
-    /**
      * The route to redirect unauthorized requests to.
      */
     private String loginRoute = DEFAULT_LOGIN_ROUTE;
@@ -88,28 +83,6 @@ public class SingleSignOnProperties {
      * value is -1 which means any number of concurrent sessions is allowed.
      */
     private int maximumConcurrentSessions = DEFAULT_MAXIMUM_SESSIONS_PER_USER;
-
-    /**
-     * Checks is auto-configuration of {@link SingleSignOnConfiguration} is
-     * enabled.
-     *
-     * @return true, if auto-configuration is enabled
-     */
-    public boolean isAutoConfigure() {
-        return autoConfigure;
-    }
-
-    /**
-     * Enables or disables auto-configuration of
-     * {@link SingleSignOnConfiguration}.
-     *
-     * @param autoConfigure
-     *            {@code true} to enable auto-configuration, {@code false} to
-     *            disable
-     */
-    public void setAutoConfigure(boolean autoConfigure) {
-        this.autoConfigure = autoConfigure;
-    }
 
     /**
      * Gets the login-route property.
@@ -181,11 +154,11 @@ public class SingleSignOnProperties {
     /**
      * Sets the Back-Channel Logout route.
      *
-     * @param backchannelLogoutRoute
+     * @param backChannelLogoutRoute
      *            the Back-Channel Logout route
      */
-    public void setBackChannelLogoutRoute(String backchannelLogoutRoute) {
-        this.backChannelLogoutRoute = backchannelLogoutRoute;
+    public void setBackChannelLogoutRoute(String backChannelLogoutRoute) {
+        this.backChannelLogoutRoute = backChannelLogoutRoute;
     }
 
     /**

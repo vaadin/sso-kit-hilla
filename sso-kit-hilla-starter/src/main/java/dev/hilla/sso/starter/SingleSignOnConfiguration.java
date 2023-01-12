@@ -9,8 +9,6 @@
  */
 package dev.hilla.sso.starter;
 
-import java.util.Objects;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -53,14 +51,20 @@ public class SingleSignOnConfiguration extends VaadinWebSecurity {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.oauth2Login().userInfoEndpoint().oidcUserService(userService).and()
                 .loginPage(properties.getLoginRoute()).and().logout()
-                .logoutSuccessUrl("/");
+                .logoutSuccessUrl("/").and().sessionManagement()
+                .sessionConcurrency(concurrency -> {
+                    // Sets the maximum number of concurrent sessions per user.
+                    // The default is -1 which means no limit on the number of
+                    // concurrent sessions per user.
+                    concurrency.maximumSessions(
+                            properties.getMaximumConcurrentSessions());
+                    // Sets the session-registry which is used for Back-Channel
+                    concurrency.sessionRegistry(sessionRegistry);
+                });
 
         if (properties.isBackChannelLogout()) {
-            var backChannelLogoutRoute = Objects.requireNonNullElse(
-                    properties.getBackChannelLogoutRoute(),
-                    SingleSignOnProperties.DEFAULT_BACKCHANNEL_LOGOUT_ROUTE);
-            backChannelLogoutFilter
-                    .setBackChannelLogoutRoute(backChannelLogoutRoute);
+            backChannelLogoutFilter.setBackChannelLogoutRoute(
+                    properties.getBackChannelLogoutRoute());
 
             // Adds the Back-Channel logout filter to the filter chain
             http.addFilterAfter(backChannelLogoutFilter, LogoutFilter.class);
@@ -68,15 +72,6 @@ public class SingleSignOnConfiguration extends VaadinWebSecurity {
             // Disable CSRF for Back-Channel logout requests
             final var matcher = backChannelLogoutFilter.getRequestMatcher();
             http.csrf().ignoringRequestMatchers(matcher);
-
-            var maximumSessions = properties.getMaximumConcurrentSessions();
-            http.sessionManagement()
-                    .sessionConcurrency(sessionConcurrencyCustomizer -> {
-                        sessionConcurrencyCustomizer
-                                .maximumSessions(maximumSessions);
-                        sessionConcurrencyCustomizer
-                                .sessionRegistry(sessionRegistry);
-                    });
         }
 
         return http.build();
