@@ -7,8 +7,7 @@ export class AboutView extends View {
   render() {
     return html`<div>
       <img style="width: 200px;" src="images/empty-plant.png" />
-      <h2>This place intentionally left empty</h2>
-      <p>It’s a place where you can grow your own UI 🤗</p>
+      <h2>This view is accessible to everyone</h2>
     </div>`;
   }
 

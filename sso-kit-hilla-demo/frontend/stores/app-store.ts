@@ -15,16 +15,20 @@ export class AppStore {
   user: User | undefined = undefined;
 
   // A list of authentication providers. You can build the login URL as
-  // `/oauth2/authorization/${client}` for each element in this array.
+  // `/oauth2/authorization/${provider}` for each element in this array.
   registeredProviders: string[] = [];
 
+  // The URL which will be called to log out from the SSO provider
   logoutUrl: string | undefined = undefined;
 
+  // If true, the app will listen to back-channel logout events
   backChannelLogoutEnabled = false;
 
-  private logoutSubscription: Subscription<string> | undefined;
-
+  // If true, the user has been logged out from the SSO provider
   backChannelLogoutHappened = false;
+
+  // The subscription to the back-channel logout event
+  private logoutSubscription: Subscription<string> | undefined;
 
   constructor() {
     makeAutoObservable(this);
