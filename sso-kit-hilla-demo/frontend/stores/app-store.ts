@@ -15,12 +15,20 @@ export class AppStore {
   user: User | undefined = undefined;
 
   // A list of authentication providers. You can build the login URL as
-  // `/oauth2/authorization/${client}` for each element in this array.
-  registeredClients: string[] = [];
+  // `/oauth2/authorization/${provider}` for each element in this array.
+  registeredProviders: string[] = [];
 
+  // The URL which will be called to log out from the SSO provider
+  logoutUrl: string | undefined = undefined;
+
+  // If true, the app will listen to back-channel logout events
+  backChannelLogoutEnabled = false;
+
+  // If true, the user has been logged out from the SSO provider
+  backChannelLogoutHappened = false;
+
+  // The subscription to the back-channel logout event
   private logoutSubscription: Subscription<string> | undefined;
-
-  backChannelLogoutHappened: boolean = false;
 
   constructor() {
     makeAutoObservable(this);
@@ -42,24 +50,25 @@ export class AppStore {
     }
   }
 
-  async fetchAuthenticationInfo() {
-    // Fetch the logged in user (can be null if not logged in)
-    this.user = await AuthEndpoint.getAuthenticatedUser();
+  async fetchAuthInfo() {
+    const authInfo = await AuthEndpoint.getAuthInfo();
+    this.user = authInfo.user;
+    this.logoutUrl = authInfo.logoutUrl;
+    this.registeredProviders = authInfo.registeredProviders;
+    this.backChannelLogoutEnabled = authInfo.backChannelLogoutEnabled;
 
-    if (this.user) {
+    if (this.user && this.backChannelLogoutEnabled) {
       this.logoutSubscription = await AuthEndpoint.backChannelLogout();
 
       this.logoutSubscription.onNext(async () => {
         this.backChannelLogoutHappened = true;
       });
     }
-
-    // Fetch the list of registered OAuth2 clients
-    this.registeredClients = await AuthEndpoint.getRegisteredClients();
   }
 
   clearUserInfo() {
     this.user = undefined;
+    this.logoutUrl = undefined;
     this.backChannelLogoutHappened = false;
 
     if (this.logoutSubscription) {

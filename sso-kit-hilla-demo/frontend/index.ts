@@ -4,7 +4,7 @@ import { appStore } from './stores/app-store';
 
 export const router = new Router(document.querySelector('#outlet'));
 
-appStore.fetchAuthenticationInfo().finally(() => {
+appStore.fetchAuthInfo().finally(() => {
   // Ensure router access checks are not done before we know if we are logged in
   router.setRoutes(routes);
 });
