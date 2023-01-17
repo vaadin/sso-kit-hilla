@@ -68,7 +68,7 @@ export class MainLayout extends Layout {
 
         <vaadin-confirm-dialog
           header="Logged out"
-          cancel
+          cancel-button-visible
           @confirm="${() => this.afterLogout(true)}"
           @cancel="${() => this.afterLogout(false)}"
           .opened="${appStore.backChannelLogoutHappened}"
