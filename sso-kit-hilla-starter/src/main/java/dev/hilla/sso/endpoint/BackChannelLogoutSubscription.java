@@ -33,8 +33,8 @@ public class BackChannelLogoutSubscription
     private final Flux<Object> flux;
 
     public BackChannelLogoutSubscription() {
-        // Create a Flux and store the FluxSink "next" method as a consumer,
-        // that will be called when a user is logged out.
+        // Create a Flux and prepare to store the FluxSink "next" method as a
+        // consumer, that will be called when a user is logged out.
         flux = Flux.create(sink -> consumer = sink::next).share();
     }
 
