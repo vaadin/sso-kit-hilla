@@ -9,6 +9,7 @@
  */
 package dev.hilla.sso.starter;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -21,7 +22,7 @@ import org.springframework.security.web.authentication.logout.LogoutFilter;
 import com.vaadin.flow.spring.security.VaadinWebSecurity;
 
 import dev.hilla.sso.starter.bclogout.BackChannelLogoutFilter;
-import dev.hilla.sso.starter.bclogout.FluxHolder;
+import dev.hilla.sso.starter.bclogout.BackChannelLogoutSubscription;
 
 @Configuration
 @EnableWebSecurity
@@ -38,12 +39,12 @@ public class SingleSignOnConfiguration extends VaadinWebSecurity {
     public SingleSignOnConfiguration(SingleSignOnProperties properties,
             SessionRegistry sessionRegistry,
             ClientRegistrationRepository clientRegistrationRepository,
-            FluxHolder fluxHolder) {
+            ApplicationEventPublisher eventPublisher) {
         this.properties = properties;
         this.sessionRegistry = sessionRegistry;
         userService = new SingleSignOnUserService();
         backChannelLogoutFilter = new BackChannelLogoutFilter(sessionRegistry,
-                clientRegistrationRepository, fluxHolder);
+                clientRegistrationRepository, eventPublisher);
     }
 
     @Bean(name = "VaadinSecurityFilterChainBean")

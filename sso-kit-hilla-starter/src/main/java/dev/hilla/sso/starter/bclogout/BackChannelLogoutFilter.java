@@ -12,6 +12,7 @@ package dev.hilla.sso.starter.bclogout;
 import java.io.IOException;
 import java.util.Objects;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.log.LogMessage;
 import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
@@ -58,7 +59,7 @@ public class BackChannelLogoutFilter extends GenericFilterBean {
     private RequestMatcher requestMatcher = new AntPathRequestMatcher(
             SingleSignOnProperties.DEFAULT_BACKCHANNEL_LOGOUT_ROUTE);
 
-    private final FluxHolder fluxHolder;
+    private final ApplicationEventPublisher eventPublisher;
 
     /**
      * Creates an instance of the filter.
@@ -67,11 +68,12 @@ public class BackChannelLogoutFilter extends GenericFilterBean {
      *            the session registry, {@code not null}
      * @param clientRegistrationRepository
      *            the client-registration repository, {@code not null}
+     * @param eventPublisher
      */
     public BackChannelLogoutFilter(SessionRegistry sessionRegistry,
             ClientRegistrationRepository clientRegistrationRepository,
-            FluxHolder fluxHolder) {
-        this(sessionRegistry, clientRegistrationRepository, fluxHolder,
+            ApplicationEventPublisher eventPublisher) {
+        this(sessionRegistry, clientRegistrationRepository, eventPublisher,
                 clientRegistration -> {
                     final var issuerUri = clientRegistration
                             .getProviderDetails().getIssuerUri();
@@ -81,15 +83,16 @@ public class BackChannelLogoutFilter extends GenericFilterBean {
 
     BackChannelLogoutFilter(SessionRegistry sessionRegistry,
             ClientRegistrationRepository clientRegistrationRepository,
-            FluxHolder fluxHolder,
+            ApplicationEventPublisher eventPublisher,
             JwtDecoderFactory<ClientRegistration> decoderFactory) {
+        this.eventPublisher = eventPublisher;
         Objects.requireNonNull(sessionRegistry);
         Objects.requireNonNull(clientRegistrationRepository);
+        Objects.requireNonNull(eventPublisher);
         Objects.requireNonNull(decoderFactory);
         this.sessionRegistry = sessionRegistry;
         this.clientRegistrationRepository = clientRegistrationRepository;
         this.decoderFactory = decoderFactory;
-        this.fluxHolder = fluxHolder;
     }
 
     @Override
@@ -175,13 +178,8 @@ public class BackChannelLogoutFilter extends GenericFilterBean {
             } else {
                 return false;
             }
-        }).peek(p -> {
-            var consumer = fluxHolder.getConsumer();
-
-            if (consumer != null) {
-                consumer.accept(p);
-            }
-        }).flatMap(p -> sessionRegistry.getAllSessions(p, false).stream())
+        }).peek(p -> eventPublisher.publishEvent(new UserLogoutEvent(p)))
+                .flatMap(p -> sessionRegistry.getAllSessions(p, false).stream())
                 .forEach(SessionInformation::expireNow);
 
         // Set the response status to 200 OK as per specification

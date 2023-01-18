@@ -1,7 +1,7 @@
 import { Subscription } from '@hilla/frontend';
 import { RouterLocation } from '@vaadin/router';
 import User from 'Frontend/generated/dev/hilla/sso/endpoint/User';
-import { AuthEndpoint } from 'Frontend/generated/endpoints';
+import { SingleSignOnEndpoint } from 'Frontend/generated/endpoints';
 import { makeAutoObservable } from 'mobx';
 
 export class AppStore {
@@ -51,14 +51,14 @@ export class AppStore {
   }
 
   async fetchAuthInfo() {
-    const authInfo = await AuthEndpoint.getAuthInfo();
+    const authInfo = await SingleSignOnEndpoint.allData();
     this.user = authInfo.user;
     this.logoutUrl = authInfo.logoutUrl;
     this.registeredProviders = authInfo.registeredProviders;
     this.backChannelLogoutEnabled = authInfo.backChannelLogoutEnabled;
 
     if (this.user && this.backChannelLogoutEnabled) {
-      this.logoutSubscription = await AuthEndpoint.backChannelLogout();
+      this.logoutSubscription = await SingleSignOnEndpoint.backChannelLogoutSubscription();
 
       this.logoutSubscription.onNext(async () => {
         this.backChannelLogoutHappened = true;

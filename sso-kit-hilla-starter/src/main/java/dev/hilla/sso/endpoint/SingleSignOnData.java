@@ -10,29 +10,28 @@
 package dev.hilla.sso.endpoint;
 
 import java.util.List;
-import java.util.Optional;
 
 import dev.hilla.Nonnull;
 
-public class AuthInfo {
-    private Optional<User> user = Optional.empty();
-    private Optional<String> logoutUrl = Optional.empty();
+public class SingleSignOnData {
+    private User user;
+    private String logoutUrl;
     private @Nonnull List<@Nonnull String> registeredProviders = List.of();
     private boolean backChannelLogoutEnabled;
 
-    public Optional<User> getUser() {
+    public User getUser() {
         return user;
     }
 
-    public void setUser(Optional<User> user) {
+    public void setUser(User user) {
         this.user = user;
     }
 
-    public Optional<String> getLogoutUrl() {
+    public String getLogoutUrl() {
         return logoutUrl;
     }
 
-    public void setLogoutUrl(Optional<String> logoutUrl) {
+    public void setLogoutUrl(String logoutUrl) {
         this.logoutUrl = logoutUrl;
     }
 

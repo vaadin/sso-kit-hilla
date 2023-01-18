@@ -3,7 +3,7 @@ package com.example.application.endpoints.helloworld;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
 import dev.hilla.Endpoint;
-import dev.hilla.sso.endpoint.AuthEndpoint;
+import dev.hilla.sso.endpoint.SingleSignOnContext;
 import jakarta.annotation.security.PermitAll;
 
 @Endpoint
@@ -12,7 +12,7 @@ public class HelloWorldEndpoint {
 
     public String sayHello(String name) {
         if (name.isEmpty()) {
-            return "Hello " + AuthEndpoint.getOidcUser()
+            return "Hello " + SingleSignOnContext.getOidcUser()
                     .map(OidcUser::getFullName).orElse("anonymous");
         } else {
             return "Hello " + name;

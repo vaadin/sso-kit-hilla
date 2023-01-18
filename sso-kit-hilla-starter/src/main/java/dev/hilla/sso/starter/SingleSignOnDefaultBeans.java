@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
 
-import dev.hilla.sso.starter.bclogout.FluxHolder;
+import dev.hilla.sso.starter.bclogout.BackChannelLogoutSubscription;
 
 /**
  * This configuration class provides default instances for the required beans.
@@ -39,7 +39,7 @@ public class SingleSignOnDefaultBeans {
 
     @Bean
     @ConditionalOnMissingBean
-    public FluxHolder getFluxSinkHolder() {
-        return new FluxHolder();
+    public BackChannelLogoutSubscription getBackChannelLogoutSubscription() {
+        return new BackChannelLogoutSubscription();
     }
 }

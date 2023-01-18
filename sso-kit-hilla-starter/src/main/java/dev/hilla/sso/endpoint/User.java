@@ -10,10 +10,16 @@
 package dev.hilla.sso.endpoint;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import dev.hilla.Nonnull;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
 public class User {
+
+    private static final String ROLE_PREFIX = "ROLE_";
+    private static final int ROLE_PREFIX_LENGTH = ROLE_PREFIX.length();
 
     private String birthdate;
     private String email;
@@ -136,4 +142,26 @@ public class User {
         this.roles = roles;
     }
 
+    public static User from(OidcUser ou) {
+        User user = new User();
+        user.setBirthdate(ou.getBirthdate());
+        user.setEmail(ou.getEmail());
+        user.setFamilyName(ou.getFamilyName());
+        user.setFullName(ou.getFullName());
+        user.setGender(ou.getGender());
+        user.setGivenName(ou.getGivenName());
+        user.setLocale(ou.getLocale());
+        user.setMiddleName(ou.getMiddleName());
+        user.setNickName(ou.getNickName());
+        user.setPhoneNumber(ou.getPhoneNumber());
+        user.setPicture(ou.getPicture());
+        user.setPreferredUsername(ou.getPreferredUsername());
+
+        user.setRoles(
+                ou.getAuthorities().stream().map(GrantedAuthority::getAuthority)
+                        .filter(a -> a.startsWith(ROLE_PREFIX))
+                        .map(a -> a.substring(ROLE_PREFIX_LENGTH))
+                        .collect(Collectors.toSet()));
+        return user;
+    }
 }
