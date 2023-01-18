@@ -1,7 +1,7 @@
 import { Subscription } from '@hilla/frontend';
 import { RouterLocation } from '@vaadin/router';
+import Message from 'Frontend/generated/dev/hilla/sso/endpoint/BackChannelLogoutSubscription/Message';
 import User from 'Frontend/generated/dev/hilla/sso/endpoint/User';
-import Message from 'Frontend/generated/dev/hilla/sso/starter/bclogout/BackChannelLogoutSubscription/Message';
 import { SingleSignOnEndpoint } from 'Frontend/generated/endpoints';
 import { makeAutoObservable } from 'mobx';
 
