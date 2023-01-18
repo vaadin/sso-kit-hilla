@@ -20,9 +20,13 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 import dev.hilla.Endpoint;
 import dev.hilla.EndpointSubscription;
 import dev.hilla.Nonnull;
-import static dev.hilla.sso.endpoint.SingleSignOnContext.getOidcUser;
 import jakarta.annotation.security.PermitAll;
 
+/**
+ * Endpoint for getting information about the current user and the SSO session.
+ * This is a default implementation, but a custom one can be used instead.
+ * Exposed methods delegate to {@link SingleSignOnContext}.
+ */
 @Endpoint
 public class SingleSignOnEndpoint {
 
@@ -35,42 +39,87 @@ public class SingleSignOnEndpoint {
         this.context = context;
     }
 
+    /**
+     * Returns all data about the current SSO session, in a single object for
+     * convenience. While the returned object is never null, most fields will
+     * have a value only if the user is logged in.
+     *
+     * @return an object of type {@link SingleSignOnData} that contains all the
+     *         available information.
+     */
     @AnonymousAllowed
     @Nonnull
     public SingleSignOnData allData() {
-        return context.getSingleSignOnData();
+        SingleSignOnData data = new SingleSignOnData();
+        data.setRegisteredProviders(context.getRegisteredProviders());
+
+        SingleSignOnContext.getOidcUser().ifPresent(u -> {
+            data.setUser(User.from(u));
+            data.setLogoutUrl(context.getLogoutUrl().orElseThrow());
+            data.setBackChannelLogoutEnabled(
+                    context.isBackChannelLogoutEnabled());
+        });
+
+        return data;
     }
 
+    /**
+     * Returns the current user, if any.
+     *
+     * @return an instance of {@link User} that contains the user's information,
+     *         mapped from the current OIDC user.
+     */
     @AnonymousAllowed
     public Optional<User> user() {
         return SingleSignOnContext.getOidcUser().map(User::from);
     }
 
+    /**
+     * Returns the status of back-channel logout.
+     *
+     * @return true if back-channel logout is enabled, false otherwise.
+     */
     @PermitAll
     public boolean backChannelLogoutEnabled() {
         return context.isBackChannelLogoutEnabled();
     }
 
+    /**
+     * Returns a subscription to back-channel logout events.
+     *
+     * @return a cancellable subscription to back-channel logout events.
+     */
     @PermitAll
     @Nonnull
-    public EndpointSubscription<@Nonnull String> backChannelLogoutSubscription() {
+    public EndpointSubscription<BackChannelLogoutSubscription.@Nonnull Message> backChannelLogoutSubscription() {
         LOGGER.debug("Client subscribed to back channel logout information");
 
-        return EndpointSubscription.of(context.getStringFlux(), () -> {
-            LOGGER.debug(
-                    "Client cancelled subscription to back channel logout information");
-        });
+        return EndpointSubscription.of(context.getBackChannelLogoutFlux(),
+                () -> {
+                    LOGGER.debug(
+                            "Client cancelled subscription to back channel logout information");
+                });
     }
 
+    /**
+     * Returns the list of registered providers.
+     *
+     * @return a list of identifiers of the registered providers.
+     */
     @AnonymousAllowed
     @Nonnull
     public List<@Nonnull String> registeredProviders() {
         return context.getRegisteredProviders();
     }
 
+    /**
+     * Returns the URL to be called to perform a logout on the SSO provider.
+     *
+     * @return the URL to call.
+     */
     @PermitAll
     @Nonnull
     public String logoutUrl() {
-        return getOidcUser().flatMap(context::getLogoutUrl).orElseThrow();
+        return context.getLogoutUrl().orElseThrow();
     }
 }

@@ -1,3 +1,12 @@
+/*-
+ * Copyright (C) 2022-2023 Vaadin Ltd
+ *
+ * This program is available under Vaadin Commercial License and Service Terms.
+ *
+ *
+ * See <https://vaadin.com/commercial-license-and-service-terms> for the full
+ * license.
+ */
 package dev.hilla.sso.endpoint;
 
 import java.util.ArrayList;
@@ -20,10 +29,12 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import dev.hilla.Nonnull;
 import dev.hilla.sso.starter.SingleSignOnProperties;
-import dev.hilla.sso.starter.bclogout.BackChannelLogoutSubscription;
 import jakarta.servlet.http.HttpServletRequest;
 import reactor.core.publisher.Flux;
 
+/**
+ * Contains utility methods and information related to single sign-on.
+ */
 @Component
 public class SingleSignOnContext {
 
@@ -45,21 +56,45 @@ public class SingleSignOnContext {
         this.backChannelLogoutSubscription = backChannelLogoutSubscription;
     }
 
+    /**
+     * Conveniently get the current OIDC user from context.
+     *
+     * @return the OidcUser as an Optional, or null if the user is not
+     *         authenticated or is not a OIDC user
+     */
     public static Optional<OidcUser> getOidcUser() {
+        // Use the Optional pattern to walk the security context and get the
+        // OIDC user
         return Optional.of(SecurityContextHolder.getContext())
                 .map(SecurityContext::getAuthentication)
                 .map(Authentication::getPrincipal)
                 .filter(OidcUser.class::isInstance).map(OidcUser.class::cast);
     }
 
+    /**
+     * Get the current HTTP request from context.
+     *
+     * @return the current HTTP request as an Optional, or null if the request
+     *         is not available in the context.
+     */
     static Optional<HttpServletRequest> getCurrentHttpRequest() {
+        // Use the Optional pattern to walk the request context and get the HTTP
+        // request
         return Optional.ofNullable(RequestContextHolder.getRequestAttributes())
                 .filter(ServletRequestAttributes.class::isInstance)
                 .map(ServletRequestAttributes.class::cast)
                 .map(ServletRequestAttributes::getRequest);
     }
 
+    /**
+     * Returns all the registered OAuth2 providers.
+     *
+     * @return a list of identifiers of the registered OAuth2 providers, as
+     *         defined in the application properties.
+     */
     public List<@Nonnull String> getRegisteredProviders() {
+        // Use the Optional pattern to walk the client registration repository
+        // down to the client registrations
         return Optional.of(clientRegistrationRepository)
                 // By default, the client registration repository is an instance
                 // of InMemoryClientRegistrationRepository
@@ -73,19 +108,34 @@ public class SingleSignOnContext {
                 }).orElse(List.of());
     }
 
+    /**
+     * Exposes the configuration property which determines whether the
+     * back-channel logout is enabled.
+     *
+     * @return true if the back-channel logout is enabled, false otherwise.
+     */
     public boolean isBackChannelLogoutEnabled() {
         return properties.isBackChannelLogout();
     }
 
-    public Optional<String> getLogoutUrl(OidcUser user) {
+    /**
+     * Returns the URL of the back-channel logout endpoint. This must be called
+     * by the client to finalize the logout procedure.
+     *
+     * @return the URL of the back-channel logout endpoint as an Optional.
+     */
+    public Optional<String> getLogoutUrl() {
+        // Use the Optional pattern to walk the security context and get the
+        // authentication token
         return Optional.of(SecurityContextHolder.getContext())
                 .map(SecurityContext::getAuthentication)
                 .filter(OAuth2AuthenticationToken.class::isInstance)
                 .map(OAuth2AuthenticationToken.class::cast)
-                .map(token -> buildLogoutUrl(user, token));
+                // build the URL from the token
+                .map(token -> buildLogoutUrl(token));
     }
 
-    private String buildLogoutUrl(OidcUser user,
+    private String buildLogoutUrl(
             OAuth2AuthenticationToken authenticationToken) {
         // Build the logout URL according to the OpenID Connect specification
         var registrationId = authenticationToken
@@ -96,6 +146,7 @@ public class SingleSignOnContext {
         // The end_session_endpoint is buried in the provider metadata
         var endSessionEndpoint = details.getConfigurationMetadata()
                 .get("end_session_endpoint").toString();
+        var user = (OidcUser) authenticationToken.getPrincipal();
         var builder = UriComponentsBuilder.fromUriString(endSessionEndpoint)
                 .queryParam("id_token_hint", user.getIdToken().getTokenValue())
                 .queryParam("post_logout_redirect_uri",
@@ -123,22 +174,14 @@ public class SingleSignOnContext {
         return logoutUri;
     }
 
-    public Flux<String> getStringFlux() {
+    /**
+     * Returns the Flux of back-channel logout messages for the current user.
+     *
+     * @return a flux which is a filter of the global flux.
+     */
+    public Flux<BackChannelLogoutSubscription.Message> getBackChannelLogoutFlux() {
         var principal = SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         return backChannelLogoutSubscription.getFluxForUser(principal);
-    }
-
-    public SingleSignOnData getSingleSignOnData() {
-        SingleSignOnData data = new SingleSignOnData();
-        data.setRegisteredProviders(getRegisteredProviders());
-
-        getOidcUser().ifPresent(u -> {
-            data.setUser(User.from(u));
-            data.setLogoutUrl(getLogoutUrl(u).orElseThrow());
-            data.setBackChannelLogoutEnabled(isBackChannelLogoutEnabled());
-        });
-
-        return data;
     }
 }

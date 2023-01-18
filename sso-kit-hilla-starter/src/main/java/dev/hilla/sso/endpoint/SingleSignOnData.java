@@ -13,6 +13,10 @@ import java.util.List;
 
 import dev.hilla.Nonnull;
 
+/**
+ * A convenience class that contains all the information about the current SSO
+ * session.
+ */
 public class SingleSignOnData {
     private User user;
     private String logoutUrl;

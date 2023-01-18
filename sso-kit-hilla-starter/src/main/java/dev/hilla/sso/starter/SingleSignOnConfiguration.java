@@ -22,7 +22,6 @@ import org.springframework.security.web.authentication.logout.LogoutFilter;
 import com.vaadin.flow.spring.security.VaadinWebSecurity;
 
 import dev.hilla.sso.starter.bclogout.BackChannelLogoutFilter;
-import dev.hilla.sso.starter.bclogout.BackChannelLogoutSubscription;
 
 @Configuration
 @EnableWebSecurity
@@ -36,6 +35,18 @@ public class SingleSignOnConfiguration extends VaadinWebSecurity {
 
     private final SessionRegistry sessionRegistry;
 
+    /**
+     * Creates an instance of this configuration bean.
+     *
+     * @param properties
+     *            the configuration properties
+     * @param sessionRegistry
+     *            the session registry
+     * @param clientRegistrationRepository
+     *            the client-registration repository
+     * @param eventPublisher
+     *            the event publisher for logout events
+     */
     public SingleSignOnConfiguration(SingleSignOnProperties properties,
             SessionRegistry sessionRegistry,
             ClientRegistrationRepository clientRegistrationRepository,
@@ -50,10 +61,16 @@ public class SingleSignOnConfiguration extends VaadinWebSecurity {
     @Bean(name = "VaadinSecurityFilterChainBean")
     @Override
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.oauth2Login().userInfoEndpoint().oidcUserService(userService).and()
-                .loginPage(properties.getLoginRoute()).and().logout()
-                .logoutSuccessUrl("/").and().sessionManagement()
-                .sessionConcurrency(concurrency -> {
+        http.oauth2Login()
+                // Use the custom user service to load the user details
+                .userInfoEndpoint().oidcUserService(userService)
+                // Set the default login route
+                .and().loginPage(properties.getLoginRoute())
+                // Set a default logout success route, as it is required,
+                // although it is not used
+                .and().logout().logoutSuccessUrl("/")
+                // Setup session management
+                .and().sessionManagement().sessionConcurrency(concurrency -> {
                     // Sets the maximum number of concurrent sessions per user.
                     // The default is -1 which means no limit on the number of
                     // concurrent sessions per user.

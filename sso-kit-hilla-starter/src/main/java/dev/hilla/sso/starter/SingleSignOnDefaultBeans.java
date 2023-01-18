@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
 
-import dev.hilla.sso.starter.bclogout.BackChannelLogoutSubscription;
+import dev.hilla.sso.endpoint.BackChannelLogoutSubscription;
 
 /**
  * This configuration class provides default instances for the required beans.

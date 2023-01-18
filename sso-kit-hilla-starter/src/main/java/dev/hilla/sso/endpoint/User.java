@@ -16,6 +16,10 @@ import dev.hilla.Nonnull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
+/**
+ * A convenience class that contains the information about the current user.
+ * Most fields are directly mapped to the OidcUser class.
+ */
 public class User {
 
     private static final String ROLE_PREFIX = "ROLE_";
@@ -142,26 +146,34 @@ public class User {
         this.roles = roles;
     }
 
-    public static User from(OidcUser ou) {
+    /**
+     * Maps the OidcUser to a User object.
+     *
+     * @param oidcUser
+     *            the OidcUser
+     * @return the User object, containing the information from the OidcUser and
+     *         a mapping of the roles.
+     */
+    public static User from(OidcUser oidcUser) {
         User user = new User();
-        user.setBirthdate(ou.getBirthdate());
-        user.setEmail(ou.getEmail());
-        user.setFamilyName(ou.getFamilyName());
-        user.setFullName(ou.getFullName());
-        user.setGender(ou.getGender());
-        user.setGivenName(ou.getGivenName());
-        user.setLocale(ou.getLocale());
-        user.setMiddleName(ou.getMiddleName());
-        user.setNickName(ou.getNickName());
-        user.setPhoneNumber(ou.getPhoneNumber());
-        user.setPicture(ou.getPicture());
-        user.setPreferredUsername(ou.getPreferredUsername());
+        user.setBirthdate(oidcUser.getBirthdate());
+        user.setEmail(oidcUser.getEmail());
+        user.setFamilyName(oidcUser.getFamilyName());
+        user.setFullName(oidcUser.getFullName());
+        user.setGender(oidcUser.getGender());
+        user.setGivenName(oidcUser.getGivenName());
+        user.setLocale(oidcUser.getLocale());
+        user.setMiddleName(oidcUser.getMiddleName());
+        user.setNickName(oidcUser.getNickName());
+        user.setPhoneNumber(oidcUser.getPhoneNumber());
+        user.setPicture(oidcUser.getPicture());
+        user.setPreferredUsername(oidcUser.getPreferredUsername());
 
-        user.setRoles(
-                ou.getAuthorities().stream().map(GrantedAuthority::getAuthority)
-                        .filter(a -> a.startsWith(ROLE_PREFIX))
-                        .map(a -> a.substring(ROLE_PREFIX_LENGTH))
-                        .collect(Collectors.toSet()));
+        user.setRoles(oidcUser.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .filter(a -> a.startsWith(ROLE_PREFIX))
+                .map(a -> a.substring(ROLE_PREFIX_LENGTH))
+                .collect(Collectors.toSet()));
         return user;
     }
 }
