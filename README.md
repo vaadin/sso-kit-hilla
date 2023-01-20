@@ -21,7 +21,7 @@ This guide explains how to add both authentication and SSO Kit to an existing Hi
 Create a Hilla application using this command:
 
 ```bash
-npx @hilla/cli init hilla-sso
+npx @hilla/cli init --next <your-project-name>
 ```
 
 ### Add dependencies
@@ -32,7 +32,7 @@ Add the `sso-kit-starter` module and the other required dependencies to the `pom
 <dependency>
     <groupId>dev.hilla</groupId>
     <artifactId>sso-kit-hilla-starter</artifactId>
-    <version>2.0-SNAPSHOT</version>
+    <version>2.0.0.alpha1</version>
 </dependency>
 
 <dependency>
@@ -206,7 +206,7 @@ Open `frontend/views/main-layout.ts` and add a login/logout button in the `foote
         ></vaadin-menu-bar>
       `
     : html`<a router-ignore href="/oauth2/authorization/keycloak">Sign in</a>`
-    )}
+  }
 </footer>
 ```
 
