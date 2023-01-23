@@ -1,7 +1,8 @@
 import { Subscription } from '@hilla/frontend';
 import { RouterLocation } from '@vaadin/router';
 import User from 'Frontend/generated/dev/hilla/sso/endpoint/User';
-import { AuthEndpoint } from 'Frontend/generated/endpoints';
+import Message from 'Frontend/generated/dev/hilla/sso/starter/BackChannelLogoutSubscription/Message';
+import { BackChannelLogoutEndpoint, SingleSignOnEndpoint, UserEndpoint } from 'Frontend/generated/endpoints';
 import { makeAutoObservable } from 'mobx';
 
 export class AppStore {
@@ -28,7 +29,7 @@ export class AppStore {
   backChannelLogoutHappened = false;
 
   // The subscription to the back-channel logout event
-  private logoutSubscription: Subscription<string> | undefined;
+  private logoutSubscription: Subscription<Message> | undefined;
 
   constructor() {
     makeAutoObservable(this);
@@ -51,14 +52,15 @@ export class AppStore {
   }
 
   async fetchAuthInfo() {
-    const authInfo = await AuthEndpoint.getAuthInfo();
-    this.user = authInfo.user;
+    const authInfo = await SingleSignOnEndpoint.getData();
     this.logoutUrl = authInfo.logoutUrl;
     this.registeredProviders = authInfo.registeredProviders;
     this.backChannelLogoutEnabled = authInfo.backChannelLogoutEnabled;
 
+    this.user = await UserEndpoint.getAuthenticatedUser();
+
     if (this.user && this.backChannelLogoutEnabled) {
-      this.logoutSubscription = await AuthEndpoint.backChannelLogout();
+      this.logoutSubscription = BackChannelLogoutEndpoint.subscribe();
 
       this.logoutSubscription.onNext(async () => {
         this.backChannelLogoutHappened = true;

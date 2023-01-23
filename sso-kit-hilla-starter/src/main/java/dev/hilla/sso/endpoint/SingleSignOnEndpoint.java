@@ -1,0 +1,24 @@
+package dev.hilla.sso.endpoint;
+
+import com.vaadin.flow.server.auth.AnonymousAllowed;
+
+import dev.hilla.Endpoint;
+import dev.hilla.Nonnull;
+import dev.hilla.sso.starter.SingleSignOnContext;
+import dev.hilla.sso.starter.SingleSignOnData;
+
+@Endpoint
+@AnonymousAllowed
+public class SingleSignOnEndpoint {
+
+    private final SingleSignOnContext singleSignOnContext;
+
+    public SingleSignOnEndpoint(SingleSignOnContext singleSignOnContext) {
+        this.singleSignOnContext = singleSignOnContext;
+    }
+
+    @Nonnull
+    public SingleSignOnData getData() {
+        return singleSignOnContext.getSingleSignOnData();
+    }
+}

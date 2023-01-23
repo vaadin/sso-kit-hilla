@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2022-2023 Vaadin Ltd
+ * Copyright (C) 2022 Vaadin Ltd
  *
  * This program is available under Vaadin Commercial License and Service Terms.
  *
@@ -7,14 +7,12 @@
  * See <https://vaadin.com/commercial-license-and-service-terms> for the full
  * license.
  */
-package dev.hilla.sso.starter;
+package com.vaadin.sso.starter;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import dev.hilla.sso.starter.bclogout.BackChannelLogoutFilter;
-
 /**
- * Definition of configuration properties for the SSO Kit Hilla starter.
+ * Definition of configuration properties for the SSO Kit starter.
  *
  * @author Vaadin Ltd
  * @since 1.0
@@ -23,28 +21,22 @@ import dev.hilla.sso.starter.bclogout.BackChannelLogoutFilter;
 public class SingleSignOnProperties {
 
     /**
-     * The prefix for SSO Kit Hilla starter properties.
+     * The prefix for SSO Kit starter properties.
      */
-    public static final String PREFIX = "hilla.sso";
+    public static final String PREFIX = "vaadin.sso";
 
     /**
      * The default login route. Unauthorized requests will be redirected to this
      * route. If there are no views mapped to this route, Spring's default login
      * page will be generated.
      */
-    static final String DEFAULT_LOGIN_ROUTE = "/login";
+    public static final String DEFAULT_LOGIN_ROUTE = "/login";
 
     /**
      * The default logout-redirect route. Web browsers will be redirected to
      * this route after the logout process has completed.
      */
     static final String DEFAULT_LOGOUT_REDIRECT_ROUTE = "{baseUrl}";
-
-    /**
-     * The default maximum number of concurrent sessions allowed per user: -1
-     * means any number of concurrent sessions is allowed.
-     */
-    static final int DEFAULT_MAXIMUM_SESSIONS_PER_USER = -1;
 
     /**
      * The default Back-Channel Logout route. This should be the same as in the
@@ -54,8 +46,19 @@ public class SingleSignOnProperties {
      *
      * @see https://openid.net/specs/openid-connect-backchannel-1_0.html
      */
-    public static final String DEFAULT_BACKCHANNEL_LOGOUT_ROUTE = "/logout/back-channel/{"
+    static final String DEFAULT_BACKCHANNEL_LOGOUT_ROUTE = "/logout/back-channel/{"
             + BackChannelLogoutFilter.REGISTRATION_ID_URI_VARIABLE_NAME + "}";
+
+    /**
+     * The default maximum number of concurrent sessions allowed per user: -1
+     * means any number of concurrent sessions is allowed.
+     */
+    static final int DEFAULT_MAXIMUM_SESSIONS_PER_USER = -1;
+
+    /**
+     * Enables (or disables) auto-configuration.
+     */
+    private boolean autoConfigure = true;
 
     /**
      * The route to redirect unauthorized requests to.
@@ -83,6 +86,28 @@ public class SingleSignOnProperties {
      * value is -1 which means any number of concurrent sessions is allowed.
      */
     private int maximumConcurrentSessions = DEFAULT_MAXIMUM_SESSIONS_PER_USER;
+
+    /**
+     * Checks is auto-configuration of {@link SingleSignOnConfiguration} is
+     * enabled.
+     *
+     * @return true, if auto-configuration is enabled
+     */
+    public boolean isAutoConfigure() {
+        return autoConfigure;
+    }
+
+    /**
+     * Enables or disables auto-configuration of
+     * {@link SingleSignOnConfiguration}.
+     *
+     * @param autoConfigure
+     *            {@code true} to enable auto-configuration, {@code false} to
+     *            disable
+     */
+    public void setAutoConfigure(boolean autoConfigure) {
+        this.autoConfigure = autoConfigure;
+    }
 
     /**
      * Gets the login-route property.

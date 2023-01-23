@@ -7,13 +7,11 @@ import '@vaadin/avatar';
 import '@vaadin/confirm-dialog';
 import '@vaadin/icon';
 import '@vaadin/menu-bar';
-import type { MenuBarItem, MenuBarItemSelectedEvent } from '@vaadin/menu-bar';
 import '@vaadin/scroller';
 import '@vaadin/tabs';
 import '@vaadin/tabs/vaadin-tab';
 import '@vaadin/vaadin-lumo-styles/vaadin-iconset';
-import User from 'Frontend/generated/dev/hilla/sso/endpoint/User';
-import { html, render } from 'lit';
+import { html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { router } from '../index';
 import { hasAccess, views } from '../routes';
@@ -52,12 +50,11 @@ export class MainLayout extends Layout {
         <footer slot="drawer">
           ${appStore.user
             ? html`
-                <vaadin-menu-bar
-                  theme="tertiary-inline contrast"
-                  .items="${this.getUserMenuItems(appStore.user)}"
-                  @item-selected="${this.userMenuItemSelected}"
-                ></vaadin-menu-bar>
-              `
+              <div className="flex items-center gap-m">
+                ${appStore.user.fullName}
+              </div>
+              <vaadin-button @click="${this.logout}">Sign out</vaadin-button>
+            `
             : appStore.registeredProviders.map(
               client => html`<a router-ignore href="/oauth2/authorization/${client}">Sign in with ${client}</a>`
             )}
@@ -69,8 +66,8 @@ export class MainLayout extends Layout {
         <vaadin-confirm-dialog
           header="Logged out"
           cancel-button-visible
-          @confirm="${() => this.afterLogout(true)}"
-          @cancel="${() => this.afterLogout(false)}"
+          @confirm="${this.relogin}"
+          @cancel="${this.logoutFromProvider}"
           .opened="${appStore.backChannelLogoutHappened}"
         >
           <p>You have been logged out. Do you want to log in again?</p>
@@ -93,44 +90,18 @@ export class MainLayout extends Layout {
     );
   }
 
-  private getUserMenuItems(user: User): MenuBarItem[] {
-    return [
-      {
-        component: this.createUserMenuItem(user),
-        children: [{ text: 'Sign out' }],
-      },
-    ];
+  private async logout() {
+    await logout(); // Logout on the server
+    appStore.logoutUrl && (location.href = appStore.logoutUrl); // Logout on the provider
   }
 
-  private createUserMenuItem(user: User) {
-    const item = document.createElement('div');
-    item.style.display = 'flex';
-    item.style.alignItems = 'center';
-    item.style.gap = 'var(--lumo-space-s)';
-    render(
-      html`
-        <span>${user.fullName}</span>
-        <vaadin-icon icon="lumo:dropdown"></vaadin-icon>
-      `,
-      item
-    );
-    return item;
+  logoutFromProvider = async () => {
+    await logout(); // Logout on the server
+    appStore.clearUserInfo(); // Logout on the client
   }
 
-  private async userMenuItemSelected(e: MenuBarItemSelectedEvent) {
-    if (e.detail.value.text === 'Sign out') {
-      await logout(); // Logout on the server
-      appStore.logoutUrl && (location.href = appStore.logoutUrl); // Logout on the provider
-    }
-  }
-
-  private async afterLogout(loginAgain: boolean) {
-    if (loginAgain) {
-      location.href = `/oauth2/authorization/${appStore.registeredProviders[0]}`;
-    } else {
-      await logout(); // Logout on the server
-      appStore.clearUserInfo(); // Logout on the client
-    }
+  relogin = () => {
+    location.href = `/oauth2/authorization/${appStore.registeredProviders[0]}`;
   }
 
   private getMenuRoutes(): RouteInfo[] {

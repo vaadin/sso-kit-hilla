@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2022-2023 Vaadin Ltd
+ * Copyright (C) 2022 Vaadin Ltd
  *
  * This program is available under Vaadin Commercial License and Service Terms.
  *
@@ -9,10 +9,17 @@
  */
 package dev.hilla.sso.endpoint;
 
-import java.util.Set;
+import java.util.List;
+
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
 import dev.hilla.Nonnull;
+import dev.hilla.sso.starter.SingleSignOnContext;
 
+/**
+ * A convenience class that contains the information about the current user.
+ * Most fields are directly mapped to the OidcUser class.
+ */
 public class User {
 
     private String birthdate;
@@ -29,7 +36,7 @@ public class User {
     private String preferredUsername;
 
     @Nonnull
-    private Set<@Nonnull String> roles = Set.of();
+    private List<@Nonnull String> roles = List.of();
 
     public String getBirthdate() {
         return birthdate;
@@ -128,12 +135,38 @@ public class User {
     }
 
     @Nonnull
-    public Set<@Nonnull String> getRoles() {
+    public List<@Nonnull String> getRoles() {
         return roles;
     }
 
-    public void setRoles(@Nonnull Set<@Nonnull String> roles) {
+    public void setRoles(@Nonnull List<@Nonnull String> roles) {
         this.roles = roles;
     }
 
+    /**
+     * Maps the OidcUser to a User object.
+     *
+     * @param oidcUser
+     *            the OidcUser
+     * @return the User object, containing the information from the OidcUser and
+     *         a mapping of the roles.
+     */
+    public static User from(OidcUser oidcUser) {
+        User user = new User();
+        user.setBirthdate(oidcUser.getBirthdate());
+        user.setEmail(oidcUser.getEmail());
+        user.setFamilyName(oidcUser.getFamilyName());
+        user.setFullName(oidcUser.getFullName());
+        user.setGender(oidcUser.getGender());
+        user.setGivenName(oidcUser.getGivenName());
+        user.setLocale(oidcUser.getLocale());
+        user.setMiddleName(oidcUser.getMiddleName());
+        user.setNickName(oidcUser.getNickName());
+        user.setPhoneNumber(oidcUser.getPhoneNumber());
+        user.setPicture(oidcUser.getPicture());
+        user.setPreferredUsername(oidcUser.getPreferredUsername());
+
+        user.setRoles(SingleSignOnContext.userRoles(oidcUser));
+        return user;
+    }
 }
