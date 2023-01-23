@@ -33,7 +33,8 @@
         </dependency>
         <dependency>
             <groupId>dev.hilla</groupId>
-            <artifactId>hilla</artifactId>
+            <artifactId>endpoint</artifactId>
+            <version>${hilla.version}</version>
         </dependency>
         <dependency>
             <groupId>com.vaadin</groupId>
