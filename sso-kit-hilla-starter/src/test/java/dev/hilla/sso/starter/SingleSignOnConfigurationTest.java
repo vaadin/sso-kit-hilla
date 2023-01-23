@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2022-2023 Vaadin Ltd
+ * Copyright (C) 2022 Vaadin Ltd
  *
  * This program is available under Vaadin Commercial License and Service Terms.
  *
@@ -23,6 +23,9 @@ import com.vaadin.flow.spring.SpringSecurityAutoConfiguration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import com.vaadin.sso.starter.SingleSignOnDefaultBeans;
+import com.vaadin.sso.starter.SingleSignOnProperties;
 
 /**
  * Test suite for {@link SingleSignOnConfiguration}.
@@ -69,7 +72,7 @@ public class SingleSignOnConfigurationTest {
 
     @Test
     public void loginRouteProperty_hasCustomValue() {
-        contextRunner.withPropertyValues("hilla.sso.login-route=/custom")
+        contextRunner.withPropertyValues("vaadin.sso.login-route=/custom")
                 .run(ctx -> {
                     var loginRoute = ctx.getBean(SingleSignOnProperties.class)
                             .getLoginRoute();

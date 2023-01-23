@@ -7,15 +7,13 @@
  * See <https://vaadin.com/commercial-license-and-service-terms> for the full
  * license.
  */
-package dev.hilla.sso.starter;
+package com.vaadin.sso.starter;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
-
-import dev.hilla.sso.starter.bclogout.FluxHolder;
 
 /**
  * This configuration class provides default instances for the required beans.
@@ -33,13 +31,7 @@ public class SingleSignOnDefaultBeans {
      */
     @Bean
     @ConditionalOnMissingBean
-    public SessionRegistry getSessionRegistry() {
+    SessionRegistry getSessionRegistry() {
         return new SessionRegistryImpl();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public FluxHolder getFluxSinkHolder() {
-        return new FluxHolder();
     }
 }

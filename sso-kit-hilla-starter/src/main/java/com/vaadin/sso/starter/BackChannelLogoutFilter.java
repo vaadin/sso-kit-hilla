@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2022-2023 Vaadin Ltd
+ * Copyright (C) 2022 Vaadin Ltd
  *
  * This program is available under Vaadin Commercial License and Service Terms.
  *
@@ -7,7 +7,7 @@
  * See <https://vaadin.com/commercial-license-and-service-terms> for the full
  * license.
  */
-package dev.hilla.sso.starter.bclogout;
+package com.vaadin.sso.starter;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -19,6 +19,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.log.LogMessage;
 import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
@@ -32,8 +33,6 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.GenericFilterBean;
 
-import dev.hilla.sso.starter.SingleSignOnProperties;
-
 /**
  * A filter responsible to handle OpenID Connect Back-Channel Logout requests.
  *
@@ -46,7 +45,7 @@ public class BackChannelLogoutFilter extends GenericFilterBean {
     /* Value defined by the specification */
     static final String TOKEN_PARAM_NAME = "logout_token";
 
-    public static final String REGISTRATION_ID_URI_VARIABLE_NAME = "registrationId";
+    static final String REGISTRATION_ID_URI_VARIABLE_NAME = "registrationId";
 
     private static final String LOG_MESSAGE = "Did not match request to %s";
 
@@ -59,7 +58,7 @@ public class BackChannelLogoutFilter extends GenericFilterBean {
     private RequestMatcher requestMatcher = new AntPathRequestMatcher(
             SingleSignOnProperties.DEFAULT_BACKCHANNEL_LOGOUT_ROUTE);
 
-    private final FluxHolder fluxHolder;
+    private final ApplicationEventPublisher eventPublisher;
 
     /**
      * Creates an instance of the filter.
@@ -68,11 +67,13 @@ public class BackChannelLogoutFilter extends GenericFilterBean {
      *            the session registry, {@code not null}
      * @param clientRegistrationRepository
      *            the client-registration repository, {@code not null}
+     * @param eventPublisher
+     *            the event-publisher to publish logout events, {@code not null}
      */
     public BackChannelLogoutFilter(SessionRegistry sessionRegistry,
             ClientRegistrationRepository clientRegistrationRepository,
-            FluxHolder fluxHolder) {
-        this(sessionRegistry, clientRegistrationRepository, fluxHolder,
+            ApplicationEventPublisher eventPublisher) {
+        this(sessionRegistry, clientRegistrationRepository, eventPublisher,
                 clientRegistration -> {
                     final var issuerUri = clientRegistration
                             .getProviderDetails().getIssuerUri();
@@ -82,15 +83,13 @@ public class BackChannelLogoutFilter extends GenericFilterBean {
 
     BackChannelLogoutFilter(SessionRegistry sessionRegistry,
             ClientRegistrationRepository clientRegistrationRepository,
-            FluxHolder fluxHolder,
+            ApplicationEventPublisher eventPublisher,
             JwtDecoderFactory<ClientRegistration> decoderFactory) {
-        Objects.requireNonNull(sessionRegistry);
-        Objects.requireNonNull(clientRegistrationRepository);
-        Objects.requireNonNull(decoderFactory);
-        this.sessionRegistry = sessionRegistry;
-        this.clientRegistrationRepository = clientRegistrationRepository;
-        this.decoderFactory = decoderFactory;
-        this.fluxHolder = fluxHolder;
+        this.sessionRegistry = Objects.requireNonNull(sessionRegistry);
+        this.clientRegistrationRepository = Objects
+                .requireNonNull(clientRegistrationRepository);
+        this.eventPublisher = Objects.requireNonNull(eventPublisher);
+        this.decoderFactory = Objects.requireNonNull(decoderFactory);
     }
 
     @Override
@@ -176,13 +175,8 @@ public class BackChannelLogoutFilter extends GenericFilterBean {
             } else {
                 return false;
             }
-        }).peek(p -> {
-            var consumer = fluxHolder.getConsumer();
-
-            if (consumer != null) {
-                consumer.accept(p);
-            }
-        }).flatMap(p -> sessionRegistry.getAllSessions(p, false).stream())
+        }).peek(p -> eventPublisher.publishEvent(new UserLogoutEvent(p)))
+                .flatMap(p -> sessionRegistry.getAllSessions(p, false).stream())
                 .forEach(SessionInformation::expireNow);
 
         // Set the response status to 200 OK as per specification
