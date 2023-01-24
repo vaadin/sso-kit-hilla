@@ -66,12 +66,11 @@ export class MainLayout extends Layout {
         <vaadin-confirm-dialog
           header="Logged out"
           cancel
-          @confirm="${this.relogin}"
-          @cancel="${this.logoutFromProvider}"
+          @confirm="${this.loginAgain}"
+          @cancel="${this.stayOnPage}"
           .opened="${appStore.backChannelLogoutHappened}"
         >
           <p>You have been logged out. Do you want to log in again?</p>
-          <p>If you click on "Cancel", the application will not work correctly until you log in again.</p>
         </vaadin-confirm-dialog>
 
         <slot></slot>
@@ -92,16 +91,17 @@ export class MainLayout extends Layout {
 
   private async logout() {
     await logout(); // Logout on the server
-    appStore.logoutUrl && (location.href = appStore.logoutUrl); // Logout on the provider
+    location.href = appStore.logoutUrl!; // Logout on the provider
   }
 
-  logoutFromProvider = async () => {
+  private async stayOnPage() {
     await logout(); // Logout on the server
     appStore.clearUserInfo(); // Logout on the client
   }
 
-  relogin = () => {
-    location.href = `/oauth2/authorization/${appStore.registeredProviders[0]}`;
+  private async loginAgain() {
+    await logout(); // Logout on the server
+    location.href = appStore.defaultLoginUrl;
   }
 
   private getMenuRoutes(): RouteInfo[] {

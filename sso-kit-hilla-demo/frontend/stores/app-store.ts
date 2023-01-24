@@ -62,7 +62,7 @@ export class AppStore {
     if (this.user && this.backChannelLogoutEnabled) {
       this.logoutSubscription = BackChannelLogoutEndpoint.subscribe();
 
-      this.logoutSubscription.onNext(async () => {
+      this.logoutSubscription.onNext(() => {
         this.backChannelLogoutHappened = true;
       });
     }
@@ -85,6 +85,10 @@ export class AppStore {
 
   isUserInRole(role: string) {
     return this.user?.roles?.includes(role);
+  }
+
+  get defaultLoginUrl() {
+    return `/oauth2/authorization/${this.registeredProviders[0]}`;
   }
 }
 
