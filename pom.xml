@@ -133,6 +133,7 @@
             </activation>
             <modules>
                 <module>sso-kit-hilla-demo</module>
+                <module>sso-kit-react-demo</module>
             </modules>
         </profile>
     </profiles>
