@@ -43,7 +43,7 @@ export default function MenuOnLeftLayout() {
 
   async function loginAgain() { 
     await _logout();
-    location.href = '/oauth2/authorization/' + state.registeredProviders[0];
+    location.href = state.loginUrl;
   }
 
   async function stayOnPage() { 
@@ -83,7 +83,7 @@ export default function MenuOnLeftLayout() {
             <Button onClick={logout}>Sign out</Button>
           </>
         ) : (
-          <a href={'/oauth2/authorization/' + state.registeredProviders[0]}>Sign in</a>
+          <a href={state.loginUrl}>Sign in</a>
         )}
       </footer>
 
