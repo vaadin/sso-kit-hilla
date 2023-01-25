@@ -6,7 +6,7 @@ import { BackChannelLogoutEndpoint, SingleSignOnEndpoint, UserEndpoint } from 'F
 import { makeAutoObservable } from 'mobx';
 
 export class AppStore {
-  applicationName = 'sso-kit-hilla-demo';
+  applicationName = 'sso-kit-demo-lit';
 
   // The location, relative to the base path, e.g. "hello" when viewing "/hello"
   location = '';

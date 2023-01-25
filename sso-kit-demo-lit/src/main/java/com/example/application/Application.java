@@ -11,7 +11,7 @@ import com.vaadin.flow.theme.Theme;
  */
 @SpringBootApplication(scanBasePackages = { "com.example.application",
         "dev.hilla.sso" })
-@Theme(value = "sso-kit-hilla-demo")
+@Theme(value = "sso-kit-demo-lit")
 public class Application implements AppShellConfigurator {
 
     public static void main(String[] args) {
