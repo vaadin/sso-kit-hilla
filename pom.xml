@@ -12,12 +12,12 @@
     </parent>
 
     <groupId>dev.hilla</groupId>
-    <artifactId>sso-kit-hilla</artifactId>
+    <artifactId>sso-kit</artifactId>
     <version>2.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
-        <module>sso-kit-hilla-starter</module>
+        <module>sso-kit-starter</module>
     </modules>
 
     <properties>
@@ -148,7 +148,7 @@
                 </property>
             </activation>
             <modules>
-                <module>sso-kit-hilla-demo</module>
+                <module>sso-kit-demo-lit</module>
             </modules>
         </profile>
     </profiles>
