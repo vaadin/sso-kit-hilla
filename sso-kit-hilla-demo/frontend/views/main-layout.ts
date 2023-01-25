@@ -101,7 +101,7 @@ export class MainLayout extends Layout {
 
   private async loginAgain() {
     await logout(); // Logout on the server
-    location.href = appStore.defaultLoginUrl;
+    location.href = appStore.loginUrl!;
   }
 
   private getMenuRoutes(): RouteInfo[] {

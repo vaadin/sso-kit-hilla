@@ -19,6 +19,9 @@ export class AppStore {
   // `/oauth2/authorization/${provider}` for each element in this array.
   registeredProviders: string[] = [];
 
+  // The default login URL
+  loginUrl: string | undefined = undefined;
+
   // The URL which will be called to log out from the SSO provider
   logoutUrl: string | undefined = undefined;
 
@@ -53,6 +56,7 @@ export class AppStore {
 
   async fetchAuthInfo() {
     const authInfo = await SingleSignOnEndpoint.getData();
+    this.loginUrl = authInfo.loginUrl;
     this.logoutUrl = authInfo.logoutUrl;
     this.registeredProviders = authInfo.registeredProviders;
     this.backChannelLogoutEnabled = authInfo.backChannelLogoutEnabled;
@@ -85,10 +89,6 @@ export class AppStore {
 
   isUserInRole(role: string) {
     return this.user?.roles?.includes(role);
-  }
-
-  get defaultLoginUrl() {
-    return `/oauth2/authorization/${this.registeredProviders[0]}`;
   }
 }
 

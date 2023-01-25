@@ -193,6 +193,7 @@ public class SingleSignOnContext {
 
     public SingleSignOnData getSingleSignOnData() {
         SingleSignOnData data = new SingleSignOnData();
+        data.setLoginUrl(properties.getLoginRoute());
         data.setRegisteredProviders(getRegisteredProviders());
 
         SingleSignOnContext.getOidcUser().ifPresent(u -> {
