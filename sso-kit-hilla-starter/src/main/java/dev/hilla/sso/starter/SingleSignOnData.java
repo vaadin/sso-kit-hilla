@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2022-2023 Vaadin Ltd
+ * Copyright (C) 2022 Vaadin Ltd
  *
  * This program is available under Vaadin Commercial License and Service Terms.
  *
@@ -7,32 +7,56 @@
  * See <https://vaadin.com/commercial-license-and-service-terms> for the full
  * license.
  */
-package dev.hilla.sso.endpoint;
+package dev.hilla.sso.starter;
 
 import java.util.List;
-import java.util.Optional;
 
 import dev.hilla.Nonnull;
 
-public class AuthInfo {
-    private Optional<User> user = Optional.empty();
-    private Optional<String> logoutUrl = Optional.empty();
+/**
+ * A convenience class that contains all the information about the current SSO
+ * session.
+ */
+public class SingleSignOnData {
+
+    private boolean authenticated;
+    private @Nonnull List<@Nonnull String> roles = List.of();
+    private @Nonnull String loginUrl;
+    private String logoutUrl;
     private @Nonnull List<@Nonnull String> registeredProviders = List.of();
     private boolean backChannelLogoutEnabled;
 
-    public Optional<User> getUser() {
-        return user;
+    public boolean isAuthenticated() {
+        return authenticated;
     }
 
-    public void setUser(Optional<User> user) {
-        this.user = user;
+    public void setAuthenticated(boolean authenticated) {
+        this.authenticated = authenticated;
     }
 
-    public Optional<String> getLogoutUrl() {
+    @Nonnull
+    public List<@Nonnull String> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(@Nonnull List<@Nonnull String> roles) {
+        this.roles = roles;
+    }
+
+    @Nonnull
+    public String getLoginUrl() {
+        return loginUrl;
+    }
+
+    public void setLoginUrl(@Nonnull String loginUrl) {
+        this.loginUrl = loginUrl;
+    }
+
+    public String getLogoutUrl() {
         return logoutUrl;
     }
 
-    public void setLogoutUrl(Optional<String> logoutUrl) {
+    public void setLogoutUrl(String logoutUrl) {
         this.logoutUrl = logoutUrl;
     }
 

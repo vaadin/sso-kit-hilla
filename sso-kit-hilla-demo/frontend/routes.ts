@@ -54,7 +54,7 @@ export const routes: ViewRoute[] = [
     icon: '',
     title: 'Login',
     action: async (_context, _command) => {
-      location.href = `/oauth2/authorization/${appStore.registeredProviders[0]}`;
+      location.href = appStore.loginUrl!;
     },
   },
   {

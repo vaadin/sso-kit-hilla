@@ -1,7 +1,8 @@
 import { Subscription } from '@hilla/frontend';
 import { RouterLocation } from '@vaadin/router';
 import User from 'Frontend/generated/dev/hilla/sso/endpoint/User';
-import { AuthEndpoint } from 'Frontend/generated/endpoints';
+import Message from 'Frontend/generated/dev/hilla/sso/starter/BackChannelLogoutSubscription/Message';
+import { BackChannelLogoutEndpoint, SingleSignOnEndpoint, UserEndpoint } from 'Frontend/generated/endpoints';
 import { makeAutoObservable } from 'mobx';
 
 export class AppStore {
@@ -18,6 +19,9 @@ export class AppStore {
   // `/oauth2/authorization/${provider}` for each element in this array.
   registeredProviders: string[] = [];
 
+  // The default login URL
+  loginUrl: string | undefined = undefined;
+
   // The URL which will be called to log out from the SSO provider
   logoutUrl: string | undefined = undefined;
 
@@ -28,7 +32,7 @@ export class AppStore {
   backChannelLogoutHappened = false;
 
   // The subscription to the back-channel logout event
-  private logoutSubscription: Subscription<string> | undefined;
+  private logoutSubscription: Subscription<Message> | undefined;
 
   constructor() {
     makeAutoObservable(this);
@@ -51,16 +55,18 @@ export class AppStore {
   }
 
   async fetchAuthInfo() {
-    const authInfo = await AuthEndpoint.getAuthInfo();
-    this.user = authInfo.user;
+    const authInfo = await SingleSignOnEndpoint.getData();
+    this.loginUrl = authInfo.loginUrl;
     this.logoutUrl = authInfo.logoutUrl;
     this.registeredProviders = authInfo.registeredProviders;
     this.backChannelLogoutEnabled = authInfo.backChannelLogoutEnabled;
 
-    if (this.user && this.backChannelLogoutEnabled) {
-      this.logoutSubscription = await AuthEndpoint.backChannelLogout();
+    this.user = await UserEndpoint.getAuthenticatedUser();
 
-      this.logoutSubscription.onNext(async () => {
+    if (this.user && this.backChannelLogoutEnabled) {
+      this.logoutSubscription = BackChannelLogoutEndpoint.subscribe();
+
+      this.logoutSubscription.onNext(() => {
         this.backChannelLogoutHappened = true;
       });
     }

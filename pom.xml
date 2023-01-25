@@ -25,9 +25,9 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <hilla.version>2.0.0.alpha8</hilla.version>
-        <flow.version>24.0.0.alpha14</flow.version>
-        <spring.boot.version>3.0.0-RC1</spring.boot.version>
+        <hilla.version>2.0.0.alpha9</hilla.version>
+        <flow.version>24.0.0.alpha15</flow.version>
+        <spring.boot.version>3.0.1</spring.boot.version>
         <maven.jar.version>3.3.0</maven.jar.version>
         <maven.source.version>3.2.1</maven.source.version>
         <maven.javadoc.version>3.4.1</maven.javadoc.version>
