@@ -51,15 +51,17 @@ Add the `sso-kit-starter` module and the other required dependencies to the `pom
 
 Then add authentication to your application as explained in the [relevant section of the Hilla documentation](https://hilla.dev/docs/lit/guides/security). While all the details are explained there, let's walk the necessary steps in sequence.
 
-### Add a Hilla Endpoint
+### Add Hilla Endpoints
 
-An [AuthEndpoint](sso-kit-hilla-starter/src/main/java/dev/hilla/sso/endpoint/AuthEndpoint.java) is already included in the kit. To use it, you must [enable the new Hilla multi-module engine](https://hilla.dev/docs/lit/reference/configuration/#java-compiler-options). The easiest way to enable it is to create (or modify) the `src/main/resources/vaadin-featureflags.properties` file and add this line:
+An [SingleSignOnEndpoint](sso-kit-starter/src/main/java/dev/hilla/sso/endpoint/SingleSignOnEndpoint.java) is already included in the kit. To use it, you must [enable the new Hilla multi-module engine](https://hilla.dev/docs/lit/reference/configuration/#java-compiler-options). The easiest way to enable it is to create (or modify) the `src/main/resources/vaadin-featureflags.properties` file and add this line:
 
 ```properties
 com.vaadin.experimental.hillaEngine=true
 ```
 
-Otherwise, or if you want to customize the returned data, copy the [whole package](https://github.com/vaadin/sso-kit-hilla/tree/main/sso-kit-hilla-starter/src/main/java/dev/hilla/sso/endpoint) into your application and modify it.
+Optionally, if you want to get user information or to have a message about the back channel logout, you can use the [UserEndpoint](sso-kit-starter/src/main/java/dev/hilla/sso/endpoint/UserEndpoint.java) and the [BackChannelLogoutEndpoint](sso-kit-starter/src/main/java/dev/hilla/sso/endpoint/BackChannelLogoutEndpoint.java) too.
+
+Otherwise, if you want to customize the returned data by the endpoints, copy the [whole package](https://github.com/vaadin/sso-kit-hilla/tree/main/sso-kit-hilla-starter/src/main/java/dev/hilla/sso/endpoint) into your application and modify it.
 
 Unless you use the same package name as for your application (by default it is `com.example.application` in generated Hilla projects), you have to whitelist your package in Spring Boot for Hilla to be able to find the Endpoint. Open your `Application.java` and add the package to the annotation:
 
