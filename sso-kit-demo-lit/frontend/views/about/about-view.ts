@@ -1,3 +1,4 @@
+import { appStore } from 'Frontend/stores/app-store';
 import { html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { View } from '../../views/view';
@@ -7,7 +8,10 @@ export class AboutView extends View {
   render() {
     return html`<div>
       <img style="width: 200px;" src="images/empty-plant.png" />
-      <h2>This view is accessible to everyone</h2>
+      <p>Username: ${appStore.user!.preferredUsername}</p>
+      <p>Full name: ${appStore.user!.fullName}</p>
+      <p>Email: ${appStore.user!.email}</p>
+      <p>Roles: ${appStore.user!.roles?.join(', ')}</p>
     </div>`;
   }
 

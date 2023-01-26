@@ -1,9 +1,10 @@
-import { logout } from '@hilla/frontend';
+import { logout as _logout } from '@hilla/frontend';
 import '@vaadin-component-factory/vcf-nav';
 import '@vaadin/app-layout';
 import { AppLayout } from '@vaadin/app-layout';
 import '@vaadin/app-layout/vaadin-drawer-toggle';
 import '@vaadin/avatar';
+import '@vaadin/button';
 import '@vaadin/confirm-dialog';
 import '@vaadin/icon';
 import '@vaadin/menu-bar';
@@ -89,22 +90,22 @@ export class MainLayout extends Layout {
     );
   }
 
-  private async logout() {
-    await logout(); // Logout on the server
-    location.href = appStore.logoutUrl!; // Logout on the provider
-  }
-
   private async stayOnPage() {
-    await logout(); // Logout on the server
+    await _logout(); // Logout on the server
     appStore.clearUserInfo(); // Logout on the client
   }
 
   private async loginAgain() {
-    await logout(); // Logout on the server
+    await _logout(); // Logout on the server
     location.href = appStore.loginUrl!;
   }
 
+  private async logout() {
+    await _logout(); // Logout on the server
+    location.href = appStore.logoutUrl!; // Logout on the provider
+  }
+  
   private getMenuRoutes(): RouteInfo[] {
-    return views.filter((route) => route.title).filter((route) => hasAccess(route)) as RouteInfo[];
+    return views.filter((route) => route.title).filter(hasAccess) as RouteInfo[];
   }
 }

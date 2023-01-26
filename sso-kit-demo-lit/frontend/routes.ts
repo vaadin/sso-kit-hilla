@@ -7,9 +7,9 @@ import './views/main-layout';
 export type ViewRoute = Route & {
   title?: string;
   icon?: string;
+  children?: ViewRoute[];
   requiresLogin?: boolean;
   rolesAllowed?: string[];
-  children?: ViewRoute[];
 };
 
 export const hasAccess = (route: Route) => {
@@ -28,24 +28,24 @@ export const views: ViewRoute[] = [
   // place routes below (more info https://hilla.dev/docs/routing)
   {
     path: '',
-    component: 'about-view',
+    component: 'hello-world-view',
     icon: '',
     title: '',
   },
   {
     path: 'hello',
-    requiresLogin: true,
+    component: 'hello-world-view',
     icon: 'la la-globe',
     title: 'Hello World',
-    action: async (_context, _command) => {
-      return hasAccess(_context.route) ? _command.component('hello-world-view') : _command.redirect('login');
-    },
   },
   {
     path: 'about',
-    component: 'about-view',
     icon: 'la la-file',
     title: 'About',
+    action: async (_context, _command) => {
+      return hasAccess(_context.route) ? _command.component('about-view') : _command.redirect('login');
+    },
+    requiresLogin: true,
   },
 ];
 export const routes: ViewRoute[] = [
@@ -54,7 +54,7 @@ export const routes: ViewRoute[] = [
     icon: '',
     title: 'Login',
     action: async (_context, _command) => {
-      location.href = appStore.loginUrl!;
+      _command.redirect(appStore.loginUrl!);
     },
   },
   {
