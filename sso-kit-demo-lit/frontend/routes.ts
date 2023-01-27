@@ -54,7 +54,7 @@ export const routes: ViewRoute[] = [
     icon: '',
     title: 'Login',
     action: async (_context, _command) => {
-      _command.redirect(appStore.loginUrl!);
+      _command.redirect(appStore.loginLink!);
     },
   },
   {

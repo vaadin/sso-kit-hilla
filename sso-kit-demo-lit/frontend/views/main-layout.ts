@@ -102,12 +102,12 @@ export class MainLayout extends Layout {
 
   private async loginAgain() {
     await _logout(); // Logout on the server
-    location.href = appStore.loginUrl!;
+    location.href = appStore.loginLink!;
   }
 
   private async logout() {
     await _logout(); // Logout on the server
-    location.href = appStore.logoutUrl!; // Logout on the provider
+    location.href = appStore.logoutLink!; // Logout on the provider
   }
   
   private getMenuRoutes(): RouteInfo[] {
