@@ -10,6 +10,6 @@ These are the currently supported identity providers:
 - [Okta](https://okta.com/)
 - [Azure Active Directory](https://azure.microsoft.com/en-us/services/active-directory/)
 
-SSO Kit is compatible with [Hilla](https://hilla.dev/) starting from version [1.3.2](https://github.com/vaadin/hilla/releases/tag/1.3.2).
+SSO Kit is compatible with [Hilla](https://hilla.dev/) starting from version [2.0.0](https://github.com/vaadin/hilla/releases/tag/2.0.0).
 
-### More details and the [Getting Started](https://hilla.dev/docs/lit/guides/tools/sso-kit/getting-started) can be found in the [Hilla documentation](https://hilla.dev/docs).
+### More details and the [Getting Started](https://hilla.dev/docs/lit/tools/sso-kit/getting-started) can be found in the [Hilla documentation](https://hilla.dev/docs).
