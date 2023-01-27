@@ -15,15 +15,11 @@ export class AppStore {
 
   user: User | undefined = undefined;
 
-  // A list of authentication providers. You can build the login URL as
-  // `/oauth2/authorization/${provider}` for each element in this array.
-  registeredProviders: string[] = [];
-
   // The default login URL
-  loginUrl: string | undefined = undefined;
+  loginLink: string | undefined = undefined;
 
   // The URL which will be called to log out from the SSO provider
-  logoutUrl: string | undefined = undefined;
+  logoutLink: string | undefined = undefined;
 
   // If true, the app will listen to back-channel logout events
   backChannelLogoutEnabled = false;
@@ -39,10 +35,9 @@ export class AppStore {
   }
 
   async fetchAuthInfo() {
-    const authInfo = await SingleSignOnEndpoint.getData();
-    this.loginUrl = authInfo.loginUrl;
-    this.logoutUrl = authInfo.logoutUrl;
-    this.registeredProviders = authInfo.registeredProviders;
+    const authInfo = await SingleSignOnEndpoint.fetchAll();
+    this.loginLink = authInfo.loginLink;
+    this.logoutLink = authInfo.logoutLink;
     this.backChannelLogoutEnabled = authInfo.backChannelLogoutEnabled;
 
     this.user = await UserEndpoint.getAuthenticatedUser();
@@ -58,7 +53,7 @@ export class AppStore {
 
   clearUserInfo() {
     this.user = undefined;
-    this.logoutUrl = undefined;
+    this.logoutLink = undefined;
     this.backChannelLogoutHappened = false;
 
     if (this.logoutSubscription) {

@@ -1,5 +1,7 @@
 package dev.hilla.sso.endpoint;
 
+import java.util.List;
+
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 
 import dev.hilla.Endpoint;
@@ -18,7 +20,12 @@ public class SingleSignOnEndpoint {
     }
 
     @Nonnull
-    public SingleSignOnData getData() {
+    public SingleSignOnData fetchAll() {
         return singleSignOnContext.getSingleSignOnData();
+    }
+
+    @Nonnull
+    public List<@Nonnull String> getRegisteredProviders() {
+        return singleSignOnContext.getRegisteredProviders();
     }
 }

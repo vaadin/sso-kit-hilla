@@ -12,8 +12,9 @@ import '@vaadin/scroller';
 import '@vaadin/tabs';
 import '@vaadin/tabs/vaadin-tab';
 import '@vaadin/vaadin-lumo-styles/vaadin-iconset';
+import { SingleSignOnEndpoint } from 'Frontend/generated/endpoints';
 import { html } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 import { router } from '../index';
 import { hasAccess, views } from '../routes';
 import { appStore } from '../stores/app-store';
@@ -27,6 +28,9 @@ interface RouteInfo {
 
 @customElement('main-layout')
 export class MainLayout extends Layout {
+  @property()
+  providers: string[] = [];
+
   render() {
     return html`
       <vaadin-app-layout primary-section="drawer">
@@ -56,7 +60,7 @@ export class MainLayout extends Layout {
               </div>
               <vaadin-button @click="${this.logout}">Sign out</vaadin-button>
             `
-            : appStore.registeredProviders.map(
+            : this.providers.map(
               client => html`<a router-ignore href="/oauth2/authorization/${client}">Sign in with ${client}</a>`
             )}
         </footer>
@@ -79,9 +83,10 @@ export class MainLayout extends Layout {
     `;
   }
 
-  connectedCallback() {
+  async connectedCallback() {
     super.connectedCallback();
     this.classList.add('block', 'h-full');
+    this.providers = await SingleSignOnEndpoint.getRegisteredProviders();
     this.reaction(
       () => appStore.location,
       () => {
@@ -97,12 +102,12 @@ export class MainLayout extends Layout {
 
   private async loginAgain() {
     await _logout(); // Logout on the server
-    location.href = appStore.loginUrl!;
+    location.href = appStore.loginLink!;
   }
 
   private async logout() {
     await _logout(); // Logout on the server
-    location.href = appStore.logoutUrl!; // Logout on the provider
+    location.href = appStore.logoutLink!; // Logout on the provider
   }
   
   private getMenuRoutes(): RouteInfo[] {
