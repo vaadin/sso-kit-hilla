@@ -97,6 +97,7 @@ public class SingleSignOnContext {
      * @return a list of identifiers of the registered OAuth2 providers, as
      *         defined in the application properties.
      */
+    @Nonnull
     public List<@Nonnull String> getRegisteredProviders() {
         // Use the Optional pattern to walk the client registration repository
         // down to the client registrations
@@ -193,7 +194,6 @@ public class SingleSignOnContext {
     public SingleSignOnData getSingleSignOnData() {
         SingleSignOnData data = new SingleSignOnData();
         data.setLoginUrl(properties.getLoginRoute());
-        data.setRegisteredProviders(getRegisteredProviders());
 
         SingleSignOnContext.getOidcUser().ifPresent(u -> {
             data.setAuthenticated(true);

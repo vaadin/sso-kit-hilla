@@ -15,10 +15,6 @@ export class AppStore {
 
   user: User | undefined = undefined;
 
-  // A list of authentication providers. You can build the login URL as
-  // `/oauth2/authorization/${provider}` for each element in this array.
-  registeredProviders: string[] = [];
-
   // The default login URL
   loginUrl: string | undefined = undefined;
 
@@ -42,7 +38,6 @@ export class AppStore {
     const authInfo = await SingleSignOnEndpoint.getData();
     this.loginUrl = authInfo.loginUrl;
     this.logoutUrl = authInfo.logoutUrl;
-    this.registeredProviders = authInfo.registeredProviders;
     this.backChannelLogoutEnabled = authInfo.backChannelLogoutEnabled;
 
     this.user = await UserEndpoint.getAuthenticatedUser();
