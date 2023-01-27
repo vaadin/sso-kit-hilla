@@ -83,6 +83,7 @@
     "@vaadin/vaadin-usage-statistics": "2.1.2",
     "@vaadin/vertical-layout": "24.0.0-alpha11",
     "@vaadin/virtual-list": "24.0.0-alpha11",
+    "buffer": "^6.0.3",
     "construct-style-sheets-polyfill": "3.1.0",
     "line-awesome": "1.3.0",
     "lit": "2.6.1",
@@ -189,7 +190,8 @@
     "@hilla/form": "$@hilla/form",
     "@hilla/generator-typescript-plugin-backbone": "$@hilla/generator-typescript-plugin-backbone",
     "@hilla/generator-typescript-cli": "$@hilla/generator-typescript-cli",
-    "@vaadin/overlay": "$@vaadin/overlay"
+    "@vaadin/overlay": "$@vaadin/overlay",
+    "buffer": "$buffer"
   },
   "vaadin": {
     "dependencies": {
@@ -272,6 +274,7 @@
       "@vaadin/vaadin-usage-statistics": "2.1.2",
       "@vaadin/vertical-layout": "24.0.0-alpha11",
       "@vaadin/virtual-list": "24.0.0-alpha11",
+      "buffer": "^6.0.3",
       "construct-style-sheets-polyfill": "3.1.0",
       "lit": "2.6.1"
     },
@@ -291,6 +294,6 @@
       "workbox-core": "6.5.4",
       "workbox-precaching": "6.5.4"
     },
-    "hash": "db15d65a4a23d694d261a13c8e896aa752fb6965084130d82d388b88f6d6f0fc"
+    "hash": "b011ba000ce08fee4d9c0f8376799b3fa7234349f0827571f3d3e7a513cf74e1"
   }
 }
