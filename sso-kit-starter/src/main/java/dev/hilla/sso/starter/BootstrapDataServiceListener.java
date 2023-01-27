@@ -9,21 +9,17 @@
  */
 package dev.hilla.sso.starter;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.List;
 
+import org.jsoup.nodes.DataNode;
 import org.springframework.stereotype.Component;
 
-import com.vaadin.flow.component.dependency.NpmPackage;
 import com.vaadin.flow.internal.JsonUtils;
 import com.vaadin.flow.server.VaadinServiceInitListener;
 
 import elemental.json.JsonValue;
 
 @Component
-// Used to decode Base64 in the browser
-@NpmPackage(value = "buffer", version = "^6.0.3")
 public class BootstrapDataServiceListener implements VaadinServiceInitListener {
 
     private final SingleSignOnContext singleSignOnContext;
@@ -39,14 +35,11 @@ public class BootstrapDataServiceListener implements VaadinServiceInitListener {
             var data = singleSignOnContext.getSingleSignOnData();
             var script = """
                     window.Hilla = window.Hilla || {};
-                    window.Hilla.BootstrapSSO = function(decoder) {
-                        return JSON.parse(decoder.from('%s', 'base64').toString('utf-8'));
-                    };
-                    """
-                    .formatted(encoded(json(data)));
+                    window.Hilla.SSO = JSON.parse("%s");
+                    """.formatted(quotesEscaped(json(data)));
 
             var scriptNode = indexHtmlResponse.getDocument()
-                    .createElement("script").text(script);
+                    .createElement("script").appendChild(new DataNode(script));
             indexHtmlResponse.getDocument().body().appendChild(scriptNode);
         });
     }
@@ -67,8 +60,7 @@ public class BootstrapDataServiceListener implements VaadinServiceInitListener {
         return json.toJson();
     }
 
-    private String encoded(String s) {
-        return Base64.getEncoder()
-                .encodeToString(s.getBytes(StandardCharsets.UTF_8));
+    private String quotesEscaped(String s) {
+        return s.replace("\"", "\\\"");
     }
 }
