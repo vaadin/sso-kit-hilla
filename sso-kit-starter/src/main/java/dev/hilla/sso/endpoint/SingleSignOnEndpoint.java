@@ -20,7 +20,7 @@ public class SingleSignOnEndpoint {
     }
 
     @Nonnull
-    public SingleSignOnData getData() {
+    public SingleSignOnData fetchAll() {
         return singleSignOnContext.getSingleSignOnData();
     }
 

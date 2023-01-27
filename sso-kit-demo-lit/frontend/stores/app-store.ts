@@ -35,7 +35,7 @@ export class AppStore {
   }
 
   async fetchAuthInfo() {
-    const authInfo = await SingleSignOnEndpoint.getData();
+    const authInfo = await SingleSignOnEndpoint.fetchAll();
     this.loginLink = authInfo.loginLink;
     this.logoutLink = authInfo.logoutLink;
     this.backChannelLogoutEnabled = authInfo.backChannelLogoutEnabled;
